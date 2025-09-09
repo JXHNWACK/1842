@@ -1,37 +1,39 @@
-	
-pricesByName	
-25GB Lite SIMO 24M	7
-25GB Value SIMO 24M	9.5
-25GB Complete SIMO 24M	12
-120GB Lite SIMO 24M	8
-120GB Value SIMO 24M	10.5
-120GB Complete SIMO 24M	13
-160GB Lite SIMO 24M	22
-160GB Value SIMO 24M	27
-160GB Complete SIMO 24M	32
-160GB Value SIMO 24M X	16.8
-160GB Complete SIMO Multi SIM 24M	20
-160GB Complete SIMO 24M X	20.8
-160GB Lite SIMO Multi SIM 24M	10
-160GB Lite SIMO 24M X	12.8
-160GB Value SIMO Multi SIM 24M	15
-250GB Complete SIMO 24M	16
-250GB Lite SIMO 24M X	12
-250GB Lite SIMO 24M	11
-250GB Value SIMO 24M	13.5
-Unlimited Lite SIMO 24M	13.5
-Unlimited Value SIMO 24M	32
-Unlimited Complete SIMO 24M	37
-Unlimited Value SIMO 24M X	19
-Unlimited Complete SIMO 24M S	20.8
-Unlimited Complete SIMO 24M X	22
-Unlimited Lite SIMO 24M S	16
-Unlimited Value SIMO 24M S	18.4
-MultiSIM Unlimited Complete 24M	19
-MultiSIM Unlimited Lite 24M	13
-MultiSIM Unlimited Value 24M	16
-Unlimited Lite SIMO 24M X	16
-half6Names	
-0	"25GB Lite SIMO 24M"
-1	"120GB Lite SIMO 24M"
-2	"Unlimited Lite SIMO 24M"
+{
+  "pricesByName": {
+    "25GB Lite SIMO 24M": 7,
+    "25GB Value SIMO 24M": 9.5,
+    "25GB Complete SIMO 24M": 12,
+    "120GB Lite SIMO 24M": 8,
+    "120GB Value SIMO 24M": 10.5,
+    "120GB Complete SIMO 24M": 13,
+    "160GB Lite SIMO 24M": 22,
+    "160GB Value SIMO 24M": 27,
+    "160GB Complete SIMO 24M": 32,
+    "160GB Value SIMO 24M X": 16.8,
+    "160GB Complete SIMO Multi SIM 24M": 20,
+    "160GB Complete SIMO 24M X": 20.8,
+    "160GB Lite SIMO Multi SIM 24M": 10,
+    "160GB Lite SIMO 24M X": 12.8,
+    "160GB Value SIMO Multi SIM 24M": 15,
+    "250GB Complete SIMO 24M": 16,
+    "250GB Lite SIMO 24M X": 12,
+    "250GB Lite SIMO 24M": 11,
+    "250GB Value SIMO 24M": 13.5,
+    "Unlimited Lite SIMO 24M": 13.5,
+    "Unlimited Value SIMO 24M": 32,
+    "Unlimited Complete SIMO 24M": 37,
+    "Unlimited Value SIMO 24M X": 19,
+    "Unlimited Complete SIMO 24M S": 20.8,
+    "Unlimited Complete SIMO 24M X": 22,
+    "Unlimited Lite SIMO 24M S": 16,
+    "Unlimited Value SIMO 24M S": 18.4,
+    "MultiSIM Unlimited Complete 24M": 19,
+    "MultiSIM Unlimited Lite 24M": 13,
+    "MultiSIM Unlimited Value 24M": 16,
+    "Unlimited Lite SIMO 24M X": 16
+  },
+  "half6Names": [
+    "25GB Lite SIMO 24M",
+    "Unlimited Lite SIMO 24M"
+  ]
+}
