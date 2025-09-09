@@ -53,6 +53,15 @@
     @media (max-width:1060px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:680px){.grid{grid-template-columns:1fr}}
 
+    /* Two-up cards on mobile / small tablets */
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    /* Single column on very small phones */
+    @media (max-width: 420px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
     .card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:8px; cursor:pointer; transition:box-shadow .12s, transform .05s; }
     .card:hover{ box-shadow:0 2px 10px rgba(0,0,0,.05);}
     .details{
@@ -147,6 +156,21 @@
       .filters select, .filters input[type="search"]{ padding:8px 10px; min-width:0 }
       .chip{ padding:6px 8px; font-size:11px }
       .filters .muted{ font-size:11px; display:none } /* hide helper tip on mobile to save space */
+
+      /* Extra‑compact cards */
+      .card{ padding:8px }
+      .card h3{ font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+      .muted{ font-size:11px }
+      .price{ font-size:18px }
+      .tag{ font-size:10px; padding:2px 6px }
+      .card div[style*="margin-top:auto"] .btn{ min-height:36px; font-size:12px }
+
+      /* Extra‑compact filters */
+      .filters{ padding:6px }
+      .filters h2{ font-size:12px; margin-bottom:2px }
+      .filters .row{ gap:4px; margin-bottom:4px !important }
+      .filters select, .filters input[type="search"]{ padding:6px 8px; min-width:0 }
+      .chip{ padding:4px 6px; font-size:10px }
     }
     /* Show sticky footer on small screens incl. big iPhones */
     @media (max-width: 900px){
