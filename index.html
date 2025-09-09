@@ -12,7 +12,7 @@
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:16px; }
     header{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--border)}
     .bar{max-width:1842px;margin:auto;padding:14px 18px;display:flex;gap:12px;align-items:center}
-    .ver{margin-left:8px;color:var(--muted);font-size:12px;display:none}
+    .ver{margin-left:8px;color:var(--muted);font-size:12px}
     h1{color:var(--ink);font-size:18px;margin:0;font-weight:700;letter-spacing:.3px}
 
     .wrap{max-width:1842px;margin:16px auto;padding:0 18px;display:grid;grid-template-columns:1fr 340px;gap:16px}
@@ -134,6 +134,7 @@
     <div class="bar">
       <h1>Leicester Gallowtree Gate • Package Builder / One Pager.</h1>
       <span class="ver">v1.0 • design locked</span>
+      <span id="lastUpdated" class="ver" style="display:inline-block"></span>
       <div class="row" style="margin-left:auto">
         <button id="loginBtn" class="btn sec">Admin login</button>
         <button id="clearBtn" class="btn sec">Clear package</button>
@@ -667,6 +668,16 @@ function packageFirst6(pkg){
   bindPinFromCart();
   bindPinnedToggle();
   render();
+  // Update last updated timestamp
+  function updateTimestamp(){
+    const el = document.getElementById('lastUpdated');
+    if(el){
+      const now = new Date();
+      const formatted = now.toLocaleString('en-GB',{ dateStyle:'short', timeStyle:'short' });
+      el.textContent = "• last updated " + formatted;
+    }
+  }
+  updateTimestamp();
   </script>
 </body>
 </html>
