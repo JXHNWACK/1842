@@ -32,6 +32,13 @@
     "MultiSIM Unlimited Value 24M": 16,
     "Unlimited Lite SIMO 24M X": 16
   },
+  "introMonthsByName": {
+    "25GB Lite SIMO 24M": 6,
+    "120GB Lite SIMO 24M": 6,
+    "120GB Value SIMO 24M": 9,
+    "120GB Complete SIMO 24M": 12,
+    "Unlimited Lite SIMO 24M": 6
+  },
   "half6Names": [
     "25GB Lite SIMO 24M",
     "120GB Lite SIMO 24M",
