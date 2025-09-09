@@ -228,8 +228,8 @@
     <aside class="cart">
       <h2>Selected Package</h2>
       <div id="cartList"></div>
-      <div class="total"><span>Months 1–6 per month</span><span id="grandFirst6">£0.00</span></div>
-      <div class="total"><span>Months 7–24 per month</span><span id="grandLater">£0.00</span></div>
+      <div class="total" id="rowFirst6"><span id="labelFirst6">Months 1–6 per month</span><span id="grandFirst6">£0.00</span></div>
+      <div class="total" id="rowLater"><span id="labelLater">Months 7–24 per month</span><span id="grandLater">£0.00</span></div>
       <div class="rule">Rules enforced: (1) Multi‑SIM must be ≤ highest data in package. (2) Cross‑sell/X requires at least one non‑Multi, non‑X base plan.</div>
     </aside>
     <div class="mbar" id="mobileBar">
@@ -559,18 +559,22 @@ function packageFirst6(pkg){
     const anyHalf = packageItems.some(it=>{
       const plan = plans.find(p=>p.name===it.name); return plan && plan.half6;
     });
-    const rowFirst = document.querySelector('.cart .total:nth-of-type(1)');
-    const rowLater = document.querySelector('.cart .total:nth-of-type(2)');
+    const rowFirst = document.getElementById('rowFirst6');
+    const rowLater = document.getElementById('rowLater');
+    const labelFirst = document.getElementById('labelFirst6');
+    const labelLater = document.getElementById('labelLater');
     const gFirst = document.getElementById('grandFirst6');
     const gLater = document.getElementById('grandLater');
+
     if(anyHalf){
       if(rowFirst) rowFirst.style.display = '';
-      if(rowLater) rowLater.querySelector('span').textContent = 'Months 7–24 per month';
+      if(labelFirst) labelFirst.textContent = 'Months 1–6 per month';
+      if(labelLater) labelLater.textContent = 'Months 7–24 per month';
       if(gFirst) gFirst.textContent = `£${totalFirst6.toFixed(2)}`;
       if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
     }else{
       if(rowFirst) rowFirst.style.display = 'none';
-      if(rowLater) rowLater.querySelector('span').textContent = 'Total per month';
+      if(labelLater) labelLater.textContent = 'Total per month';
       if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
     }
     // Mobile footer
