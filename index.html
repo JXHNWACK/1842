@@ -384,34 +384,41 @@
       const badge=document.getElementById('overridesBadge');
       if(badge){
         badge.style.display='inline-block';
-        badge.textContent = `Overrides active (${stats.priceUpdates} prices, ${stats.half6Updates} 6mhp)`;
+        badge.textContent = `Overrides active (${stats.priceUpdates} prices, ${stats.introUpdates} intro)`;
       }
       render();
     }catch(e){ console.warn('overrides.json not loaded', e); }
   }
-  function applyOverrides(data){
-    let priceUpdates = 0, half6Updates = 0;
-    const missingNames = [];
-    if(data && data.pricesByName){
-      for(const [name,price] of Object.entries(data.pricesByName)){
-        const p = plans.find(x=>x.name===name);
-        if(p && typeof price==='number') { p.price = price; priceUpdates++; }
-        else { missingNames.push(name); }
-      }
+function applyOverrides(data){
+  let priceUpdates = 0, introUpdates = 0;
+  const missingNames = [];
+  if(data && data.pricesByName){
+    for(const [name,price] of Object.entries(data.pricesByName)){
+      const p = plans.find(x=>x.name===name);
+      if(p && typeof price==='number') { p.price = price; priceUpdates++; }
+      else { missingNames.push(name); }
     }
-    if(data && Array.isArray(data.half6Names)){
-      const set = new Set(data.half6Names);
-      for(const p of plans){
-        const before = !!p.half6;
-        p.half6 = set.has(p.name);
-        if(p.half6 && !before) half6Updates++;
-      }
-    }
-    if(missingNames.length){
-      console.warn('Overrides: no plan matches for', missingNames);
-    }
-    return { priceUpdates, half6Updates };
   }
+  // New: explicit intro months map (6/9/12)
+  if(data && data.introMonthsByName){
+    for(const [name,months] of Object.entries(data.introMonthsByName)){
+      const p = plans.find(x=>x.name===name);
+      const m = Number(months);
+      if(p && (m===6 || m===9 || m===12)) { p.introMonths = m; introUpdates++; }
+    }
+  }
+  // Legacy fallback: half6Names => introMonths=6
+  if(data && Array.isArray(data.half6Names)){
+    for(const name of data.half6Names){
+      const p = plans.find(x=>x.name===name);
+      if(p){ if(!p.introMonths) introUpdates++; p.introMonths = 6; }
+    }
+  }
+  if(missingNames.length){
+    console.warn('Overrides: no plan matches for', missingNames);
+  }
+  return { priceUpdates, introUpdates };
+}
   loadOverridesFromJSON();
 
   function savePinned(){ localStorage.setItem('pinnedPackages', JSON.stringify(PINNED)); }
@@ -937,10 +944,9 @@ if (admin && adminRow) {
     const btn = document.getElementById('exportOverridesBtn');
     if(!btn) return;
     btn.onclick = ()=>{
-      const prices = {};
-      plans.forEach(p=>{ prices[p.name] = Number(p.price); });
-      const half6 = plans.filter(p=>p.half6).map(p=>p.name);
-      const payload = { pricesByName: prices, half6Names: half6 };
+      const prices = {}; const intro = {};
+      plans.forEach(p=>{ prices[p.name] = Number(p.price); if(p.introMonths>0) intro[p.name]=p.introMonths; });
+      const payload = { pricesByName: prices, introMonthsByName: intro, half6Names: Object.keys(intro).filter(n=>intro[n]===6) };
       const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href=url; a.download='overrides.json'; a.click(); URL.revokeObjectURL(url);
