@@ -56,10 +56,11 @@
     /* Two-up cards on mobile / small tablets */
     @media (max-width: 900px){
       .grid{ grid-template-columns: repeat(2, 1fr); }
+      .grid{ gap:8px }
     }
-    /* Single column on very small phones */
+    /* Keep two-up even on very small phones */
     @media (max-width: 420px){
-      .grid{ grid-template-columns: 1fr; }
+      .grid{ grid-template-columns: repeat(2, 1fr); }
     }
 
     .card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:8px; cursor:pointer; transition:box-shadow .12s, transform .05s; }
@@ -196,30 +197,32 @@
 
   <div class="wrap">
     <section class="filters">
-      <h2>Filters</h2>
-      <div class="row" style="margin-bottom:8px">
-        <input id="q" type="search" placeholder="Search e.g. 120GB, Lite, Unlimited…" />
-        <select id="tier">
-          <option value="">All tiers</option>
-          <option>Lite</option>
-          <option>Value</option>
-          <option>Complete</option>
-        </select>
-        <select id="data">
-          <option value="">All data</option>
-          <option>25GB</option>
-          <option>120GB</option>
-          <option>160GB</option>
-          <option>250GB</option>
-          <option>Unlimited</option>
-        </select>
-        <label class="chip"><input id="flagX" type="checkbox" /> Cross‑sell (X)</label>
-        <label class="chip"><input id="flagS" type="checkbox" /> Student (S)</label>
-        <label class="chip"><input id="flagMulti" type="checkbox" /> Multi‑SIM</label>
-        <label class="chip"><input id="flagHalf6" type="checkbox" /> 6m half price</label>
+      <h2>Filters <button id="toggleFilters" class="btn sec sm" style="margin-left:8px">▲</button></h2>
+      <div id="filtersBody">
+        <div class="row" style="margin-bottom:8px">
+          <input id="q" type="search" placeholder="Search e.g. 120GB, Lite, Unlimited…" />
+          <select id="tier">
+            <option value="">All tiers</option>
+            <option>Lite</option>
+            <option>Value</option>
+            <option>Complete</option>
+          </select>
+          <select id="data">
+            <option value="">All data</option>
+            <option>25GB</option>
+            <option>120GB</option>
+            <option>160GB</option>
+            <option>250GB</option>
+            <option>Unlimited</option>
+          </select>
+          <label class="chip"><input id="flagX" type="checkbox" /> Cross‑sell (X)</label>
+          <label class="chip"><input id="flagS" type="checkbox" /> Student (S)</label>
+          <label class="chip"><input id="flagMulti" type="checkbox" /> Multi‑SIM</label>
+          <label class="chip"><input id="flagHalf6" type="checkbox" /> 6m half price</label>
+        </div>
+        <div class="muted">Tip: Click a plan to add it to the package. Multi‑SIM requires a base plan in the package with <b>same or higher data</b>. Cross‑sell (X) requires a base plan too.</div>
+        <div class="admin-bar"><span id="adminState" class="admin-on" style="display:none">Admin mode: prices editable</span></div>
       </div>
-      <div class="muted">Tip: Click a plan to add it to the package. Multi‑SIM requires a base plan in the package with <b>same or higher data</b>. Cross‑sell (X) requires a base plan too.</div>
-      <div class="admin-bar"><span id="adminState" class="admin-on" style="display:none">Admin mode: prices editable</span></div>
     </section>
 
     <section class="pinned" id="pinnedSection">
@@ -824,10 +827,22 @@ function packageFirst6(pkg){
     else if(pw!==null){ alert('Incorrect password'); }
   });
 
+  function bindFiltersToggle(){
+    const btn = document.getElementById('toggleFilters');
+    const body = document.getElementById('filtersBody');
+    if(!btn || !body) return;
+    const set = (open)=>{ body.style.display = open? 'block' : 'none'; btn.textContent = open? '▲' : '▼'; };
+    // Default: open on desktop, collapsed on mobile
+    const isMobile = window.matchMedia('(max-width: 760px)').matches;
+    set(!isMobile ? true : false);
+    btn.addEventListener('click', ()=>{ set(body.style.display==='none'); });
+  }
+
   console.info("SIM Package Builder running", DESIGN_VERSION);
   bindPinnedEditor();
   bindPinFromCart();
   bindExportPinned();
+  bindFiltersToggle();
   function bindExportOverrides(){
     const btn = document.getElementById('exportOverridesBtn');
     if(!btn) return;
