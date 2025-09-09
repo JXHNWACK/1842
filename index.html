@@ -561,15 +561,17 @@ function packageFirst6(pkg){
     });
     const rowFirst = document.querySelector('.cart .total:nth-of-type(1)');
     const rowLater = document.querySelector('.cart .total:nth-of-type(2)');
+    const gFirst = document.getElementById('grandFirst6');
+    const gLater = document.getElementById('grandLater');
     if(anyHalf){
-      rowFirst.style.display = '';
-      rowLater.querySelector('span').textContent = 'Months 7–24 per month';
-      document.getElementById('grandFirst6').textContent = `£${totalFirst6.toFixed(2)}`;
-      document.getElementById('grandLater').textContent = `£${totalLater.toFixed(2)}`;
+      if(rowFirst) rowFirst.style.display = '';
+      if(rowLater) rowLater.querySelector('span').textContent = 'Months 7–24 per month';
+      if(gFirst) gFirst.textContent = `£${totalFirst6.toFixed(2)}`;
+      if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
     }else{
-      rowFirst.style.display = 'none';
-      rowLater.querySelector('span').textContent = 'Total per month';
-      document.getElementById('grandLater').textContent = `£${totalLater.toFixed(2)}`;
+      if(rowFirst) rowFirst.style.display = 'none';
+      if(rowLater) rowLater.querySelector('span').textContent = 'Total per month';
+      if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
     }
     // Mobile footer
     const mb = document.getElementById('mobileBar');
@@ -724,8 +726,22 @@ function packageFirst6(pkg){
   ['q','tier','data','flagX','flagS','flagMulti','flagHalf6'].forEach(id=> document.getElementById(id).addEventListener('input',render));
   document.getElementById('clearBtn').addEventListener('click',()=>{packageItems=[];render()});
   document.getElementById('exportBtn').addEventListener('click',()=>{
+    // recompute totals for export
+    let totalLater=0, totalFirst6=0, anyHalf=false;
+    for(const it of packageItems){
+      const plan = plans.find(p=>p.name===it.name);
+      const base = it.price*it.qty;
+      totalLater += (plan && plan.half6) ? (base*2) : base;
+      totalFirst6 += base;
+      if(plan && plan.half6) anyHalf = true;
+    }
     const lines = packageItems.map(it=>`${it.qty} × ${it.name} — £${(it.price*it.qty).toFixed(2)}`);
-    lines.push(`Total per month: £${grand.textContent.replace('£','')}`);
+    if(anyHalf){
+      lines.push(`Months 1–6 per month: £${totalFirst6.toFixed(2)}`);
+      lines.push(`Months 7–24 per month: £${totalLater.toFixed(2)}`);
+    }else{
+      lines.push(`Total per month: £${totalLater.toFixed(2)}`);
+    }
     const blob = new Blob([lines.join('\n')],{type:'text/plain'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href=url; a.download='package.txt'; a.click(); URL.revokeObjectURL(url);
