@@ -315,6 +315,7 @@
 
     <aside class="cart">
       <h2>Selected Package</h2>
+      <div id="cartSummary" class="muted" style="margin-bottom:6px;font-size:12px"></div>
       <div id="cartList"></div>
       <div class="total" id="rowFirst6"><span id="labelFirst6">Months 1–6 per month</span><span id="grandFirst6">£0.00</span></div>
       <div class="total" id="rowLater"><span id="labelLater">Months 7–24 per month</span><span id="grandLater">£0.00</span></div>
@@ -708,6 +709,15 @@ totalFirst6 += first6;
   const n = plan ? (plan.introMonths||0) : 0;
   return Math.max(m,n);
 }, 0);
+// Update small cart summary line under the title
+const summaryEl = document.getElementById('cartSummary');
+if (summaryEl) {
+  if (maxIntro > 0) {
+    summaryEl.textContent = `Intro £${totalFirst6.toFixed(2)} → Later £${totalLater.toFixed(2)}`;
+  } else {
+    summaryEl.textContent = '';
+  }
+}
     const rowFirst = document.getElementById('rowFirst6');
     const rowLater = document.getElementById('rowLater');
     const labelFirst = document.getElementById('labelFirst6');
@@ -991,7 +1001,7 @@ if (admin && adminRow) {
       if(el) el.textContent = "• last updated " + formatted;
     }catch(e){ console.warn("Could not fetch commit info", e); }
   }
-  updateTimestampFromGitHub();
+  uupdateTimestampFromGitHub();
   </script>
 </body>
 </html>
