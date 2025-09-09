@@ -104,6 +104,7 @@
     .admin-on{color:var(--amber);font-size:12px}
     .editable{border:1px dashed var(--amber);background:#fff;color:var(--ink)}
 
+    .mbar{ display:none }
     /* Mobile optimisations */
     @media (max-width: 760px){
       .wrap{grid-template-columns:1fr; padding:0 12px}
@@ -146,12 +147,13 @@
       .filters select, .filters input[type="search"]{ padding:8px 10px; min-width:0 }
       .chip{ padding:6px 8px; font-size:11px }
       .filters .muted{ font-size:11px; display:none } /* hide helper tip on mobile to save space */
+    }
+    /* Show sticky footer on small screens incl. big iPhones */
     @media (max-width: 900px){
       .mbar{ display:flex }
-      body{ padding-bottom:64px }
+      body{ padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) }
+      .mbar{ padding-bottom: env(safe-area-inset-bottom, 0px); z-index: 999 }
     }
-    }
-    .mbar{ display:none }
   </style>
 </head>
 <body>
