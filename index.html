@@ -243,6 +243,7 @@
         <button id="clearBtn" class="btn sec">Clear package</button>
         <button id="exportBtn" class="btn">Export package</button>
         <button id="exportOverridesBtn" class="btn sec" style="display:none" title="Download overrides.json for GitHub">Export overrides</button>
+        <button id="reloadOverridesBtn" class="btn sec" style="display:none" title="Reload overrides.json">Reload overrides</button>
       </div>
     </div>
   </header>
@@ -367,24 +368,41 @@
   // Load shared price/flag overrides if overrides.json exists at root
   async function loadOverridesFromJSON(){
     try{
-      const resp = await fetch('./overrides.json', {cache:'no-store'});
+      const resp = await fetch(`./overrides.json?v=${Date.now()}`, {cache:'no-store'});
       if(!resp.ok) return; // no shared overrides file present
       const data = await resp.json();
-      applyOverrides(data);
+      const stats = applyOverrides(data);
+      // Show badge with stats
+      const badge=document.getElementById('overridesBadge');
+      if(badge){
+        badge.style.display='inline-block';
+        badge.textContent = `Overrides active (${stats.priceUpdates} prices, ${stats.half6Updates} 6mhp)`;
+      }
       render();
-    }catch(e){ /* ignore if not present */ }
+    }catch(e){ console.warn('overrides.json not loaded', e); }
   }
   function applyOverrides(data){
+    let priceUpdates = 0, half6Updates = 0;
+    const missingNames = [];
     if(data && data.pricesByName){
       for(const [name,price] of Object.entries(data.pricesByName)){
         const p = plans.find(x=>x.name===name);
-        if(p && typeof price==='number') p.price = price;
+        if(p && typeof price==='number') { p.price = price; priceUpdates++; }
+        else { missingNames.push(name); }
       }
     }
     if(data && Array.isArray(data.half6Names)){
       const set = new Set(data.half6Names);
-      for(const p of plans){ p.half6 = set.has(p.name); }
+      for(const p of plans){
+        const before = !!p.half6;
+        p.half6 = set.has(p.name);
+        if(p.half6 && !before) half6Updates++;
+      }
     }
+    if(missingNames.length){
+      console.warn('Overrides: no plan matches for', missingNames);
+    }
+    return { priceUpdates, half6Updates };
   }
   loadOverridesFromJSON();
 
@@ -862,6 +880,7 @@ function packageFirst6(pkg){
       const np=document.getElementById('newPinnedFromCart'); if(np) np.style.display='none';
       const ex=document.getElementById('exportPinnedJson'); if(ex) ex.style.display='none';
       const eo=document.getElementById('exportOverridesBtn'); if(eo) eo.style.display='none';
+      const ro=document.getElementById('reloadOverridesBtn'); if(ro) ro.style.display='none';
       closePinnedEditor();
       render();
       return;
@@ -874,6 +893,7 @@ function packageFirst6(pkg){
       const np=document.getElementById('newPinnedFromCart'); if(np) np.style.display='inline-block';
       const ex=document.getElementById('exportPinnedJson'); if(ex) ex.style.display='inline-block';
       const eo=document.getElementById('exportOverridesBtn'); if(eo) eo.style.display='inline-block';
+      const ro=document.getElementById('reloadOverridesBtn'); if(ro) ro.style.display='inline-block';
       render();
     }
     else if(pw!==null){ alert('Incorrect password'); }
@@ -909,6 +929,12 @@ function packageFirst6(pkg){
     };
   }
   bindExportOverrides();
+  function bindReloadOverrides(){
+    const btn = document.getElementById('reloadOverridesBtn');
+    if(!btn) return;
+    btn.onclick = ()=> loadOverridesFromJSON();
+  }
+  bindReloadOverrides();
   bindPinnedToggle();
   render();
   document.getElementById('mScrollCart')?.addEventListener('click', ()=>{
