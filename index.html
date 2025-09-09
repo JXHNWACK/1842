@@ -126,6 +126,28 @@
       .btn.sm, .btn.sec.sm{padding:8px 10px}
       .card{padding:12px}
       header .row{gap:8px}
+
+      /* Larger readable base size on mobile */
+      body{ font-size:17px }
+
+      /* Buttons fill better and are touch-friendly */
+      .card .btn, .pcard .btn{ min-height:44px }
+      .pcard .btn{ width:100% }
+      .card div[style*="margin-top:auto"]{ display:flex }
+      .card div[style*="margin-top:auto"] .btn{ flex:1 }
+
+      /* Make filter chips horizontally scrollable instead of wrapping to multiple lines */
+      .filters .row{ overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px }
+      .filters .row::-webkit-scrollbar{ display:none }
+
+      /* Prevent hover effects on touch devices */
+      .card:hover, .pcard:hover{ transform:none; box-shadow:none }
+
+      /* Quantity field easier to tap */
+      .cart input[type="number"]{ height:44px }
+    }
+    @media (hover: none){
+      .card:hover, .pcard:hover{ transform:none; box-shadow:none }
     }
   </style>
 </head>
