@@ -140,6 +140,16 @@
       .mbar .spacer{ flex:1 }
       .mbar .btn{ min-height:36px }
       body{ padding-bottom:64px } /* avoid content underlap */
+      .filters{ padding:8px }
+      .filters h2{ font-size:13px; margin-bottom:4px }
+      .filters .row{ gap:6px; margin-bottom:6px !important }
+      .filters select, .filters input[type="search"]{ padding:8px 10px; min-width:0 }
+      .chip{ padding:6px 8px; font-size:11px }
+      .filters .muted{ font-size:11px; display:none } /* hide helper tip on mobile to save space */
+    @media (max-width: 900px){
+      .mbar{ display:flex }
+      body{ padding-bottom:64px }
+    }
     }
     .mbar{ display:none }
   </style>
@@ -544,10 +554,37 @@ function packageFirst6(pkg){
       const first6 = base; // first 6 months use stored (half) price when half6
       totalFirst6 += first6;
     });
-    document.getElementById('grandLater').textContent = `£${totalLater.toFixed(2)}`;
-    document.getElementById('grandFirst6').textContent = `£${totalFirst6.toFixed(2)}`;
-    const mf = document.getElementById('mFirst6'); if(mf) mf.textContent = `£${totalFirst6.toFixed(2)}`;
-    const ml = document.getElementById('mLater'); if(ml) ml.textContent = `£${totalLater.toFixed(2)}`;
+    const anyHalf = packageItems.some(it=>{
+      const plan = plans.find(p=>p.name===it.name); return plan && plan.half6;
+    });
+    const rowFirst = document.querySelector('.cart .total:nth-of-type(1)');
+    const rowLater = document.querySelector('.cart .total:nth-of-type(2)');
+    if(anyHalf){
+      rowFirst.style.display = '';
+      rowLater.querySelector('span').textContent = 'Months 7–24 per month';
+      document.getElementById('grandFirst6').textContent = `£${totalFirst6.toFixed(2)}`;
+      document.getElementById('grandLater').textContent = `£${totalLater.toFixed(2)}`;
+    }else{
+      rowFirst.style.display = 'none';
+      rowLater.querySelector('span').textContent = 'Total per month';
+      document.getElementById('grandLater').textContent = `£${totalLater.toFixed(2)}`;
+    }
+    // Mobile footer
+    const mb = document.getElementById('mobileBar');
+    const mbFirst = document.getElementById('mFirst6')?.parentElement;
+    const mbLater = document.getElementById('mLater')?.parentElement;
+    if(mb && mbFirst && mbLater){
+      if(anyHalf){
+        mbFirst.style.display = '';
+        mbLater.querySelector('span').textContent = '7–24m';
+        document.getElementById('mFirst6').textContent = `£${totalFirst6.toFixed(2)}`;
+        document.getElementById('mLater').textContent = `£${totalLater.toFixed(2)}`;
+      }else{
+        mbFirst.style.display = 'none';
+        mbLater.querySelector('span').textContent = 'Total';
+        document.getElementById('mLater').textContent = `£${totalLater.toFixed(2)}`;
+      }
+    }
   }
 
   function card(p){
