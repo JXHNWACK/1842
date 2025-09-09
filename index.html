@@ -304,7 +304,7 @@
           <label class="chip fitem"><input id="flagX" type="checkbox" /> Cross‑sell (X)</label>
           <label class="chip fitem"><input id="flagS" type="checkbox" /> Student (S)</label>
           <label class="chip fitem"><input id="flagMulti" type="checkbox" /> Multi‑SIM</label>
-          <div class="fitem"></div>
+          <div class="fitem"><button id="resetFilters" class="btn sec sm" title="Clear all filters">Reset</button></div>
         </div>
         <div class="muted">Tip: Click a plan to add it to the package. Multi‑SIM requires a base plan in the package with <b>same or higher data</b>. Cross‑sell (X) requires a base plan too.</div>
         <div class="admin-bar"><span id="adminState" class="admin-on" style="display:none">Admin mode: prices editable</span></div>
@@ -965,6 +965,16 @@ if (admin && adminRow) {
 
 // controls
 ['q','tier','data','flagX','flagS','flagMulti','introSel'].forEach(id=> document.getElementById(id)?.addEventListener('input',render));
+  document.getElementById('resetFilters')?.addEventListener('click', ()=>{
+    document.getElementById('q').value = '';
+    document.getElementById('tier').value = '';
+    document.getElementById('data').value = '';
+    document.getElementById('flagX').checked = false;
+    document.getElementById('flagS').checked = false;
+    document.getElementById('flagMulti').checked = false;
+    const is = document.getElementById('introSel'); if(is) is.value = '';
+    render();
+  });
   document.getElementById('mClear')?.addEventListener('click', ()=>{ packageItems=[]; render(); });
   document.getElementById('clearBtnCart')?.addEventListener('click', ()=>{ packageItems=[]; render(); });
   document.getElementById('exportBtn').addEventListener('click',()=>{
@@ -1084,9 +1094,18 @@ if (admin && adminRow) {
   }));
   // restore from session and sync once
   (function(){ const savedOv = sessionStorage.getItem('overrideRules'); if(savedOv){ overrideRules = (savedOv==='1'); } syncOv(); })();
-  document.getElementById('mScrollCart')?.addEventListener('click', ()=>{
-    document.querySelector('.cart')?.scrollIntoView({behavior:'smooth', block:'start'});
-  });
+  function scrollToCart(){
+    const cart = document.querySelector('.cart'); if(!cart) return;
+    const header = document.querySelector('header');
+    const bar = document.getElementById('mobileBar');
+    const rect = cart.getBoundingClientRect();
+    const headerH = header ? header.offsetHeight : 0;
+    const barH = bar && window.matchMedia('(max-width: 900px)').matches ? bar.offsetHeight : 0;
+    const pad = 8; // small breathing room
+    const top = rect.top + window.scrollY - headerH - pad; // position with header above
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+  document.getElementById('mScrollCart')?.addEventListener('click', scrollToCart);
   async function updateTimestampFromGitHub(){
     try{
       const resp = await fetch('https://api.github.com/repos/JXHNWACK/1842/commits/main');
