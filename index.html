@@ -133,8 +133,7 @@
   <header>
     <div class="bar">
       <h1>Leicester Gallowtree Gate • Package Builder / One Pager.</h1>
-      <span class="ver">v1.0 • design locked</span>
-      <span id="lastUpdated" class="ver" style="display:inline-block"></span>
+      <span id="lastUpdated" class="ver" style="display:inline-block">• last updated …</span>
       <div class="row" style="margin-left:auto">
         <button id="loginBtn" class="btn sec">Admin login</button>
         <button id="clearBtn" class="btn sec">Clear package</button>
@@ -668,16 +667,19 @@ function packageFirst6(pkg){
   bindPinFromCart();
   bindPinnedToggle();
   render();
-  // Update last updated timestamp
-  function updateTimestamp(){
-    const el = document.getElementById('lastUpdated');
-    if(el){
-      const now = new Date();
-      const formatted = now.toLocaleString('en-GB',{ dateStyle:'short', timeStyle:'short' });
-      el.textContent = "• last updated " + formatted;
-    }
+  async function updateTimestampFromGitHub(){
+    try{
+      const resp = await fetch('https://api.github.com/repos/JXHNWACK/1842/commits/main');
+      if(!resp.ok) return;
+      const data = await resp.json();
+      const iso = data.commit.committer.date;
+      const dt = new Date(iso);
+      const formatted = dt.toLocaleString('en-GB',{ dateStyle:'short', timeStyle:'short' });
+      const el = document.getElementById('lastUpdated');
+      if(el) el.textContent = "• last updated " + formatted;
+    }catch(e){ console.warn("Could not fetch commit info", e); }
   }
-  updateTimestamp();
+  updateTimestampFromGitHub();
   </script>
 </body>
 </html>
