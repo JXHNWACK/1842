@@ -244,7 +244,6 @@
       <span id="overridesBadge" class="chip-accent" style="display:none">Overrides active</span>
       <span id="pinnedBadge" class="chip-accent" style="display:none">Pinned active</span>
       <div class="row" style="margin-left:auto">
-        <button id="themeBtn" class="btn sec" title="Toggle theme">Theme</button>
         <button id="loginBtn" class="btn sec">Muhammad/Wade/Karin</button>
         <button id="exportBtn" class="btn">Export package</button>
         <button id="exportOverridesBtn" class="btn sec" style="display:none" title="Download overrides.json for GitHub">Export overrides</button>
@@ -1046,35 +1045,20 @@ if (admin && adminRow) {
   }
   updateTimestampFromGitHub();
 
-  // Theme toggle
-  (function(){
-    const key = 'theme';
-    const saved = localStorage.getItem(key);
-    if(saved){ document.body.setAttribute('data-theme', saved); }
-    const btn = document.getElementById('themeBtn');
-    if(btn){
-      btn.addEventListener('click', ()=>{
-        const cur = document.body.getAttribute('data-theme')==='dark' ? '' : 'dark';
-        if(cur) document.body.setAttribute('data-theme','dark'); else document.body.removeAttribute('data-theme');
-        localStorage.setItem(key, cur);
-      });
-    }
-  })();
 
   async function loadChangelog(){
     try{
-      const resp = await fetch('https://api.github.com/repos/JXHNWACK/1842/commits?per_page=3');
+      const resp = await fetch('https://api.github.com/repos/JXHNWACK/1842/commits/main');
       if(!resp.ok) return;
-      const items = await resp.json();
+      const data = await resp.json();
       const list = document.getElementById('changelogList');
       const bar = document.getElementById('changelogBar');
       const close = document.getElementById('changelogClose');
       if(!list || !bar) return;
-      const html = items.map(c=>{
-        const msg = (c.commit && c.commit.message ? c.commit.message.split('\n')[0] : 'Update');
-        const when = new Date(c.commit.committer.date).toLocaleString('en-GB',{ dateStyle:'short', timeStyle:'short' });
-        return `<div style="margin-right:14px;display:inline-block"><b>${msg}</b> <span style="color:var(--muted)">(${when})</span></div>`;
-      }).join('');
+      // Only show latest commit message and date
+      const msg = (data.commit && data.commit.message ? data.commit.message.split('\n')[0] : 'Update');
+      const when = new Date(data.commit.committer.date).toLocaleString('en-GB',{ dateStyle:'short', timeStyle:'short' });
+      const html = `<div style="margin-right:14px;display:inline-block"><b>${msg}</b> <span style="color:var(--muted)">(${when})</span></div>`;
       list.innerHTML = html;
       bar.style.display = 'block';
       if(close){ close.onclick = ()=> bar.style.display = 'none'; }
