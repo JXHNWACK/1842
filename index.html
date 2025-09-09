@@ -32,7 +32,8 @@
   padding: 2px 6px;
   border-radius: 6px;
 }
-
+    #pinnedBadge { font-size: 11px; padding: 2px 6px; border-radius: 6px }
+    
     /* Pinned packages */
     .pinned{background:#fdf8f5;border:1px solid var(--border);border-radius:12px;padding:12px 12px;margin-top:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);border-left:8px solid var(--accent); grid-column:1}
     .pinned h2{font-size:14px;color:var(--ink);margin:0 0 8px;display:flex;align-items:center;gap:8px}
@@ -238,6 +239,7 @@
       <h1>Leicester Gallowtree Gate • Package Builder / One Pager.</h1>
       <span id="lastUpdated" class="ver" style="display:inline-block">• last updated …</span>
       <span id="overridesBadge" class="chip-accent" style="display:none">Overrides active</span>
+      <span id="pinnedBadge" class="chip-accent" style="display:none">Pinned active</span>
       <div class="row" style="margin-left:auto">
         <button id="loginBtn" class="btn sec">Muhammad/Wade/Karin</button>
         <button id="clearBtn" class="btn sec">Clear package</button>
@@ -359,6 +361,7 @@
       const data = await resp.json();
       if(Array.isArray(data)){
         PINNED = data;
+        const pb = document.getElementById('pinnedBadge'); if(pb) pb.style.display='inline-block';
         renderPinned();
       }
     }catch(e){ /* ignore if not present */ }
@@ -956,3 +959,4 @@ function packageFirst6(pkg){
   </script>
 </body>
 </html>
+mp
