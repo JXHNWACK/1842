@@ -176,6 +176,48 @@
       .filters .row{ gap:4px; margin-bottom:4px !important }
       .filters select, .filters input[type="search"]{ padding:6px 8px; min-width:0 }
       .chip{ padding:4px 6px; font-size:10px }
+
+      /* ===== Ultra-compact mobile mode ===== */
+      body{ font-size:14px }
+
+      /* Header shrink */
+      header .bar{ padding:4px 8px }
+      header h1{ font-size:12px }
+      header .row .btn{ padding:6px 8px; font-size:11px }
+
+      /* Filters tighter */
+      .filters{ padding:4px }
+      .filters h2{ font-size:11px; margin-bottom:2px }
+      .filters .row{ gap:4px; margin-bottom:4px !important }
+      .filters select, .filters input[type="search"]{ padding:6px 8px; min-width:0 }
+      .chip{ padding:3px 6px; font-size:10px }
+
+      /* Cards: two-up tiny, readable */
+      .grid{ gap:6px }
+      .card{ padding:6px }
+      .card h3{ font-size:12px; line-height:1.2; white-space:normal; overflow:hidden }
+      .muted{ font-size:10.5px }
+      .price{ font-size:16px }
+      .tag{ font-size:9px; padding:1px 5px }
+      .card div[style*="margin-top:auto"] .btn{ min-height:32px; font-size:11px; padding:6px 8px }
+      /* Hide the small meta line to save height */
+      .card > .muted{ display:none }
+
+      /* Cart compaction */
+      .cart{ padding:10px }
+      .cart h2{ font-size:14px }
+      .cart .item{ gap:6px }
+      .cart .item .name{ font-size:12px }
+      .cart .item .note{ font-size:10px }
+      .cart input[type="number"]{ width:50px; height:36px }
+      .total{ font-size:14px }
+      .rule{ font-size:11px }
+
+      /* Sticky footer: smaller */
+      .mbar{ padding:6px 8px }
+      .mbar .tot{ font-size:11px }
+      .mbar .tot b{ font-size:12px }
+      .mbar .btn{ min-height:32px }
     }
     /* Show sticky footer on small screens incl. big iPhones */
     @media (max-width: 900px){
