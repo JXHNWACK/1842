@@ -25,7 +25,8 @@
       },
       {
         "name": "160GB Lite SIMO Multi SIM 24M",
-        "qty": 2
+        "qty": 2,
+        "introMonths": 6
       }
     ]
   }
