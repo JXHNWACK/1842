@@ -26,6 +26,13 @@
     .filters{padding:14px; grid-column:1;}
     .filters h2{font-size:14px;color:var(--ink);margin:0 0 8px}
     .filters label{color:var(--muted);font-size:12px}
+    /* Compact Filters grid */
+    .filters-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; align-items:stretch }
+    .filters-grid .fitem{ display:block }
+    .filters-grid select,
+    .filters-grid input[type="search"]{ width:100%; min-width:0 }
+    .filters-grid .chip{ justify-content:center; width:100% }
+    @media (max-width: 900px){ .filters-grid{ grid-template-columns:repeat(2,1fr) } }
     .row{display:flex;gap:8px;flex-wrap:wrap}
     select,input[type="search"]{background:var(--panel);border:1px solid var(--border);color:var(--ink);padding:10px 12px;border-radius:10px;min-width:160px}
     .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#f3eee6;color:var(--ink);padding:8px 10px;border-radius:999px;cursor:pointer;font-size:12px}
@@ -141,7 +148,7 @@
 
       /* Make filter controls stack nicely */
       .row{gap:6px}
-      .row > *{flex:1 1 100%; min-width:0}
+      /* .row > *{flex:1 1 100%; min-width:0} */ /* removed: replaced by filters-grid */
       select, input[type="search"]{width:100% !important; min-width:0}
 
       /* Touch-friendly controls */
@@ -266,31 +273,38 @@
     <section class="filters">
       <h2>Filters <button id="toggleFilters" class="btn sec sm" style="margin-left:8px">▲</button></h2>
       <div id="filtersBody">
-        <div class="row" style="margin-bottom:8px">
-          <input id="q" type="search" placeholder="Search e.g. 120GB, Lite, Unlimited…" />
-          <select id="tier">
-            <option value="">All tiers</option>
-            <option>Lite</option>
-            <option>Value</option>
-            <option>Complete</option>
-          </select>
-          <select id="data">
-            <option value="">All data</option>
-            <option>25GB</option>
-            <option>120GB</option>
-            <option>160GB</option>
-            <option>250GB</option>
-            <option>Unlimited</option>
-          </select>
-          <label class="chip"><input id="flagX" type="checkbox" /> Cross‑sell (X)</label>
-          <label class="chip"><input id="flagS" type="checkbox" /> Student (S)</label>
-          <label class="chip"><input id="flagMulti" type="checkbox" /> Multi‑SIM</label>
-          <select id="introSel" title="Intro half-price">
-  <option value="">Intro price: Any</option>
-  <option value="6">6 months</option>
-  <option value="9">9 months</option>
-  <option value="12">12 months</option>
-</select>
+        <div class="filters-grid" style="margin-bottom:8px">
+          <div class="fitem"><input id="q" type="search" placeholder="Search e.g. 120GB, Lite, Unlimited…" /></div>
+          <div class="fitem">
+            <select id="tier">
+              <option value="">All tiers</option>
+              <option>Lite</option>
+              <option>Value</option>
+              <option>Complete</option>
+            </select>
+          </div>
+          <div class="fitem">
+            <select id="data">
+              <option value="">All data</option>
+              <option>25GB</option>
+              <option>120GB</option>
+              <option>160GB</option>
+              <option>250GB</option>
+              <option>Unlimited</option>
+            </select>
+          </div>
+          <div class="fitem">
+            <select id="introSel" title="Intro half-price">
+              <option value="">Intro price: Any</option>
+              <option value="6">6 months</option>
+              <option value="9">9 months</option>
+              <option value="12">12 months</option>
+            </select>
+          </div>
+          <label class="chip fitem"><input id="flagX" type="checkbox" /> Cross‑sell (X)</label>
+          <label class="chip fitem"><input id="flagS" type="checkbox" /> Student (S)</label>
+          <label class="chip fitem"><input id="flagMulti" type="checkbox" /> Multi‑SIM</label>
+          <div class="fitem"></div>
         </div>
         <div class="muted">Tip: Click a plan to add it to the package. Multi‑SIM requires a base plan in the package with <b>same or higher data</b>. Cross‑sell (X) requires a base plan too.</div>
         <div class="admin-bar"><span id="adminState" class="admin-on" style="display:none">Admin mode: prices editable</span></div>
