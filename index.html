@@ -27,6 +27,11 @@
     select,input[type="search"]{background:var(--panel);border:1px solid var(--border);color:var(--ink);padding:10px 12px;border-radius:10px;min-width:160px}
     .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#f3eee6;color:var(--ink);padding:8px 10px;border-radius:999px;cursor:pointer;font-size:12px}
     .chip-accent{background:var(--accent);color:#fff;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+    #overridesBadge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
 
     /* Pinned packages */
     .pinned{background:#fdf8f5;border:1px solid var(--border);border-radius:12px;padding:12px 12px;margin-top:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);border-left:8px solid var(--accent); grid-column:1}
@@ -232,6 +237,7 @@
     <div class="bar">
       <h1>Leicester Gallowtree Gate • Package Builder / One Pager.</h1>
       <span id="lastUpdated" class="ver" style="display:inline-block">• last updated …</span>
+      <span id="overridesBadge" class="chip-accent" style="display:none">Overrides active</span>
       <div class="row" style="margin-left:auto">
         <button id="loginBtn" class="btn sec">Muhammad/Wade/Karin</button>
         <button id="clearBtn" class="btn sec">Clear package</button>
