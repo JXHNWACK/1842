@@ -177,6 +177,7 @@
         <span class="actions">
           <button id="editPinnedBtn" class="btn sec sm" style="display:none">Edit</button>
           <button id="newPinnedFromCart" class="btn sm" style="display:none">Pin cart</button>
+          <button id="exportPinnedJson" class="btn sec sm" style="display:none" title="Download pinned.json for GitHub">Export JSON</button>
         </span>
       </h2>
       <div id="pinned" class="pgrid"></div>
@@ -235,6 +236,20 @@
     const savedPinned = JSON.parse(localStorage.getItem('pinnedPackages')||'null');
     if(Array.isArray(savedPinned)) PINNED = savedPinned;
   }catch{ /* ignore parse errors */ }
+
+  // Try to load shared pinned packages from pinned.json at site root (if repo includes it)
+  async function loadPinnedFromJSON(){
+    try{
+      const resp = await fetch('./pinned.json', {cache:'no-store'});
+      if(!resp.ok) return; // no shared file present
+      const data = await resp.json();
+      if(Array.isArray(data)){
+        PINNED = data;
+        renderPinned();
+      }
+    }catch(e){ /* ignore if not present */ }
+  }
+  loadPinnedFromJSON();
 
   function savePinned(){ localStorage.setItem('pinnedPackages', JSON.stringify(PINNED)); }
 
@@ -365,6 +380,18 @@ function packageFirst6(pkg){
       PINNED.unshift({ title: title || 'Pinned package', items });
       savePinned();
       renderPinned();
+    };
+  }
+
+  function bindExportPinned(){
+    const btn = document.getElementById('exportPinnedJson');
+    if(!btn) return;
+    btn.onclick = ()=>{
+      const blob = new Blob([JSON.stringify(PINNED, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'pinned.json'; a.click();
+      URL.revokeObjectURL(url);
     };
   }
 
@@ -647,6 +674,7 @@ function packageFirst6(pkg){
       document.getElementById('adminState').style.display='none';
       const ebtn=document.getElementById('editPinnedBtn'); if(ebtn) ebtn.style.display='none';
       const np=document.getElementById('newPinnedFromCart'); if(np) np.style.display='none';
+      const ex=document.getElementById('exportPinnedJson'); if(ex) ex.style.display='none';
       closePinnedEditor();
       render();
       return;
@@ -657,6 +685,7 @@ function packageFirst6(pkg){
       document.getElementById('adminState').style.display='inline';
       const ebtn=document.getElementById('editPinnedBtn'); if(ebtn) ebtn.style.display='inline-block';
       const np=document.getElementById('newPinnedFromCart'); if(np) np.style.display='inline-block';
+      const ex=document.getElementById('exportPinnedJson'); if(ex) ex.style.display='inline-block';
       render();
     }
     else if(pw!==null){ alert('Incorrect password'); }
@@ -665,6 +694,7 @@ function packageFirst6(pkg){
   console.info("SIM Package Builder running", DESIGN_VERSION);
   bindPinnedEditor();
   bindPinFromCart();
+  bindExportPinned();
   bindPinnedToggle();
   render();
   async function updateTimestampFromGitHub(){
