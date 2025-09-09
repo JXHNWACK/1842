@@ -10,6 +10,7 @@
     :root{ --bg:#ECE4D8; --panel:#F6EEE3; --muted:#5b534a; --ink:#1a1917; --primary:#2f2a25; --primaryText:#fffaf5; --border:#E0D6C8; --accent:#ff7a59; --red:#d92d20; --amber:#b7791f; }
     *{box-sizing:border-box}
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:16px; }
+    html, body{ max-width:100%; overflow-x:hidden }
     header{position:static;top:auto;z-index:5;background:var(--panel);border-bottom:1px solid var(--border)}
     .bar{max-width:1842px;margin:auto;padding:14px 18px;display:flex;gap:12px;align-items:center}
     .ver{margin-left:8px;color:var(--muted);font-size:12px}
@@ -130,7 +131,7 @@
       /* Make filter controls stack nicely */
       .row{gap:6px}
       .row > *{flex:1 1 100%; min-width:0}
-      select, input[type="search"]{width:100%}
+      select, input[type="search"]{width:100% !important; min-width:0}
 
       /* Touch-friendly controls */
       .btn{padding:12px}
@@ -138,6 +139,9 @@
       .card{padding:12px}
       header .row{gap:8px}
 
+      /* Header wraps to avoid forcing page width */
+      header .bar{ flex-wrap:wrap }
+      header .bar .row{ width:100%; flex-wrap:wrap; gap:6px }
       /* Smaller header on mobile */
       header .bar{ padding:6px 10px }
       header h1{ font-size:14px }
@@ -160,7 +164,7 @@
 
       /* Extra‑compact cards */
       .card{ padding:8px }
-      .card h3{ font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+      .card h3{ font-size:13px; white-space:normal; overflow:hidden }
       .muted{ font-size:11px }
       .price{ font-size:18px }
       .tag{ font-size:10px; padding:2px 6px }
