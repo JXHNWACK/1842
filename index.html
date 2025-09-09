@@ -165,6 +165,7 @@
         <button id="loginBtn" class="btn sec">Admin login</button>
         <button id="clearBtn" class="btn sec">Clear package</button>
         <button id="exportBtn" class="btn">Export package</button>
+        <button id="exportOverridesBtn" class="btn sec" style="display:none" title="Download overrides.json for GitHub">Export overrides</button>
       </div>
     </div>
   </header>
@@ -283,6 +284,30 @@
     }catch(e){ /* ignore if not present */ }
   }
   loadPinnedFromJSON();
+
+  // Load shared price/flag overrides if overrides.json exists at root
+  async function loadOverridesFromJSON(){
+    try{
+      const resp = await fetch('./overrides.json', {cache:'no-store'});
+      if(!resp.ok) return; // no shared overrides file present
+      const data = await resp.json();
+      applyOverrides(data);
+      render();
+    }catch(e){ /* ignore if not present */ }
+  }
+  function applyOverrides(data){
+    if(data && data.pricesByName){
+      for(const [name,price] of Object.entries(data.pricesByName)){
+        const p = plans.find(x=>x.name===name);
+        if(p && typeof price==='number') p.price = price;
+      }
+    }
+    if(data && Array.isArray(data.half6Names)){
+      const set = new Set(data.half6Names);
+      for(const p of plans){ p.half6 = set.has(p.name); }
+    }
+  }
+  loadOverridesFromJSON();
 
   function savePinned(){ localStorage.setItem('pinnedPackages', JSON.stringify(PINNED)); }
 
@@ -757,6 +782,7 @@ function packageFirst6(pkg){
       const ebtn=document.getElementById('editPinnedBtn'); if(ebtn) ebtn.style.display='none';
       const np=document.getElementById('newPinnedFromCart'); if(np) np.style.display='none';
       const ex=document.getElementById('exportPinnedJson'); if(ex) ex.style.display='none';
+      const eo=document.getElementById('exportOverridesBtn'); if(eo) eo.style.display='none';
       closePinnedEditor();
       render();
       return;
@@ -768,6 +794,7 @@ function packageFirst6(pkg){
       const ebtn=document.getElementById('editPinnedBtn'); if(ebtn) ebtn.style.display='inline-block';
       const np=document.getElementById('newPinnedFromCart'); if(np) np.style.display='inline-block';
       const ex=document.getElementById('exportPinnedJson'); if(ex) ex.style.display='inline-block';
+      const eo=document.getElementById('exportOverridesBtn'); if(eo) eo.style.display='inline-block';
       render();
     }
     else if(pw!==null){ alert('Incorrect password'); }
@@ -777,6 +804,20 @@ function packageFirst6(pkg){
   bindPinnedEditor();
   bindPinFromCart();
   bindExportPinned();
+  function bindExportOverrides(){
+    const btn = document.getElementById('exportOverridesBtn');
+    if(!btn) return;
+    btn.onclick = ()=>{
+      const prices = {};
+      plans.forEach(p=>{ prices[p.name] = Number(p.price); });
+      const half6 = plans.filter(p=>p.half6).map(p=>p.name);
+      const payload = { pricesByName: prices, half6Names: half6 };
+      const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='overrides.json'; a.click(); URL.revokeObjectURL(url);
+    };
+  }
+  bindExportOverrides();
   bindPinnedToggle();
   render();
   document.getElementById('mScrollCart')?.addEventListener('click', ()=>{
