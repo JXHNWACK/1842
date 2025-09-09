@@ -855,19 +855,24 @@ function packageFirst6(pkg){
   ['q','tier','data','flagX','flagS','flagMulti','flagHalf6'].forEach(id=> document.getElementById(id).addEventListener('input',render));
   document.getElementById('clearBtn').addEventListener('click',()=>{packageItems=[];render()});
   document.getElementById('exportBtn').addEventListener('click',()=>{
-    // recompute totals for export
-    let totalLater=0, totalFirst6=0, anyHalf=false;
+    // recompute totals for export (supports introMonths 6/9/12 and legacy half6)
+    let totalLater=0, totalFirst=0;
+    const maxIntro = packageItems.reduce((m,it)=>{
+      const plan = plans.find(p=>p.name===it.name);
+      const n = plan ? (plan.introMonths || (plan.half6?6:0) || 0) : 0;
+      return Math.max(m,n);
+    }, 0);
     for(const it of packageItems){
       const plan = plans.find(p=>p.name===it.name);
       const base = it.price*it.qty;
-      totalLater += (plan && plan.half6) ? (base*2) : base;
-      totalFirst6 += base;
-      if(plan && plan.half6) anyHalf = true;
+      const isIntro = !!(plan && (plan.introMonths>0 || plan.half6));
+      totalLater += isIntro ? (base*2) : base; // post-intro months use double
+      totalFirst += base;                      // intro months use stored (half) price
     }
     const lines = packageItems.map(it=>`${it.qty} × ${it.name} — £${(it.price*it.qty).toFixed(2)}`);
-    if(anyHalf){
-      lines.push(`Months 1–6 per month: £${totalFirst6.toFixed(2)}`);
-      lines.push(`Months 7–24 per month: £${totalLater.toFixed(2)}`);
+    if(maxIntro>0){
+      lines.push(`Months 1–${maxIntro} per month: £${totalFirst.toFixed(2)}`);
+      lines.push(`Months ${maxIntro+1}–24 per month: £${totalLater.toFixed(2)}`);
     }else{
       lines.push(`Total per month: £${totalLater.toFixed(2)}`);
     }
