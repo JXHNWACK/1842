@@ -273,7 +273,12 @@
           <label class="chip"><input id="flagX" type="checkbox" /> Cross‑sell (X)</label>
           <label class="chip"><input id="flagS" type="checkbox" /> Student (S)</label>
           <label class="chip"><input id="flagMulti" type="checkbox" /> Multi‑SIM</label>
-          <label class="chip"><input id="flagHalf6" type="checkbox" /> 6m half price</label>
+          <select id="introSel" title="Intro half-price">
+  <option value="">Intro price: Any</option>
+  <option value="6">6 months</option>
+  <option value="9">9 months</option>
+  <option value="12">12 months</option>
+</select>
         </div>
         <div class="muted">Tip: Click a plan to add it to the package. Multi‑SIM requires a base plan in the package with <b>same or higher data</b>. Cross‑sell (X) requires a base plan too.</div>
         <div class="admin-bar"><span id="adminState" class="admin-on" style="display:none">Admin mode: prices editable</span></div>
@@ -741,11 +746,17 @@ function packageFirst6(pkg){
         <button class="btn">Add</button>
         <button class="btn sec" title="Add & duplicate">Add ×2</button>
       </div>
-      <div class="muted" data-admin="half6" style="display:none">
-        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
-          <input type="checkbox" ${p.half6? 'checked':''}/> 6 months half price
-        </label>
-      </div>
+      <div class="muted" data-admin="intro" style="display:none">
+  <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+    Intro half price:
+    <select data-intro-sel>
+      <option value="0" ${!p.introMonths?'selected':''}>None</option>
+      <option value="6" ${p.introMonths===6?'selected':''}>6m</option>
+      <option value="9" ${p.introMonths===9?'selected':''}>9m</option>
+      <option value="12" ${p.introMonths===12?'selected':''}>12m</option>
+    </select>
+  </label>
+</div>
     `;
 
     // Admin live price edit
@@ -762,19 +773,19 @@ function packageFirst6(pkg){
       });
     }
 
-    // Admin: toggle 6-month half price
-    const adminRow = el.querySelector('[data-admin="half6"]');
-    if(admin && adminRow){
-      adminRow.style.display = 'block';
-      const c = adminRow.querySelector('input[type="checkbox"]');
-      c.addEventListener('change', (e)=>{
-        p.half6 = !!e.target.checked;
-        const map = JSON.parse(localStorage.getItem('half6ByName')||'{}');
-        if(p.half6) map[p.name] = true; else delete map[p.name];
-        localStorage.setItem('half6ByName', JSON.stringify(map));
-        render();
-      });
-    }
+    // Admin: set intro half-price months (0/6/9/12)
+const adminRow = el.querySelector('[data-admin="intro"]');
+if (admin && adminRow) {
+  adminRow.style.display = 'block';
+  const sel = adminRow.querySelector('[data-intro-sel]');
+  sel.addEventListener('change',(e)=>{
+    p.introMonths = Number(e.target.value||0);
+    const map = JSON.parse(localStorage.getItem('introByName')||'{}');
+    if (p.introMonths>0) map[p.name]=p.introMonths; else delete map[p.name];
+    localStorage.setItem('introByName', JSON.stringify(map));
+    render();
+  });
+}
 
     const add = (qty)=>{
       const ok = canAdd(p);
@@ -852,8 +863,7 @@ function packageFirst6(pkg){
   }
 
   // controls
-  ['q','tier','data','flagX','flagS','flagMulti','flagHalf6'].forEach(id=> document.getElementById(id).addEventListener('input',render));
-  document.getElementById('clearBtn').addEventListener('click',()=>{packageItems=[];render()});
+['q','tier','data','flagX','flagS','flagMulti','introSel'].forEach(id=> document.getElementById(id)?.addEventListener('input',render));  document.getElementById('clearBtn').addEventListener('click',()=>{packageItems=[];render()});
   document.getElementById('exportBtn').addEventListener('click',()=>{
     // recompute totals for export (supports introMonths 6/9/12 and legacy half6)
     let totalLater=0, totalFirst=0;
