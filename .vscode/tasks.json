@@ -2,14 +2,21 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Deploy to GitHub",
-      "type": "shell",
-      "command": "git add index.html && git commit -m 'Update build' && git push origin main",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": []
+        "label": "Deploy to GitHub",
+        "type": "shell",
+        "command": "git add . && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m 'Update build') && git push origin main",
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": []
+    },
+    {
+        "label": "Deploy (force new build)",
+        "type": "shell",
+        "command": "git add . && git commit --allow-empty -m 'Force Pages rebuild' && git push origin main",
+        "group": "none",
+        "problemMatcher": []
     }
-  ]
+]
 }
