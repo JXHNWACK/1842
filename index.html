@@ -1043,19 +1043,33 @@ if (admin && adminRow) {
   bindReloadOverrides();
   bindPinnedToggle();
   render();
-  // Bind override button toggle
+  // Bind override buttons (desktop cart + mobile footer)
   const obtn = document.getElementById('overrideBtn');
-  if(obtn){
-    const syncBtn = ()=>{
+  const mobOv = document.getElementById('mOverride');
+  const syncOv = ()=>{
+    if(obtn){
       obtn.textContent = `Override rules (existing customer): ${overrideRules?'ON':'OFF'}`;
       obtn.classList.toggle('on', overrideRules);
-    };
-    obtn.addEventListener('click', ()=>{ overrideRules = !overrideRules; sessionStorage.setItem('overrideRules', overrideRules? '1':'0'); syncBtn(); render(); });
-    // restore from session
-    const savedOv = sessionStorage.getItem('overrideRules');
-    if(savedOv){ overrideRules = (savedOv==='1'); }
-    syncBtn();
-  }
+    }
+    if(mobOv){
+      mobOv.textContent = `Override: ${overrideRules?'ON':'OFF'}`;
+      mobOv.classList.toggle('on', overrideRules);
+    }
+    const rn = document.getElementById('rulesNote');
+    if(rn){
+      rn.textContent = overrideRules
+        ? 'Override ACTIVE: Multi‑SIM and X rules are bypassed for existing customers.'
+        : 'Rules enforced: (1) Multi‑SIM must be ≤ highest data in package. (2) Cross‑sell/X requires at least one non‑Multi, non‑X base plan.';
+    }
+  };
+  [obtn, mobOv].forEach(btn=> btn && btn.addEventListener('click', ()=>{
+    overrideRules = !overrideRules;
+    sessionStorage.setItem('overrideRules', overrideRules? '1':'0');
+    syncOv();
+    render();
+  }));
+  // restore from session and sync once
+  (function(){ const savedOv = sessionStorage.getItem('overrideRules'); if(savedOv){ overrideRules = (savedOv==='1'); } syncOv(); })();
   document.getElementById('mScrollCart')?.addEventListener('click', ()=>{
     document.querySelector('.cart')?.scrollIntoView({behavior:'smooth', block:'start'});
   });
