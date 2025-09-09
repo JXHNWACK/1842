@@ -716,16 +716,12 @@ totalFirst6 += first6;
     const gLater = document.getElementById('grandLater');
 
     if(maxIntro>0){
-  if(rowFirst) rowFirst.style.display = '';
-  if(labelFirst) labelFirst.textContent = `Months 1–${maxIntro} per month`;
-  if(labelLater) labelLater.textContent = `Months ${maxIntro+1}–24 per month`;
-  if(gFirst) gFirst.textContent = `£${totalFirst6.toFixed(2)}`;
-  if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
-}else{
-  if(rowFirst) rowFirst.style.display = 'none';
-  if(labelLater) labelLater.textContent = 'Total per month';
-  if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
-}{
+      if(rowFirst) rowFirst.style.display = '';
+      if(labelFirst) labelFirst.textContent = `Months 1–${maxIntro} per month`;
+      if(labelLater) labelLater.textContent = `Months ${maxIntro+1}–24 per month`;
+      if(gFirst) gFirst.textContent = `£${totalFirst6.toFixed(2)}`;
+      if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
+    }else{
       if(rowFirst) rowFirst.style.display = 'none';
       if(labelLater) labelLater.textContent = 'Total per month';
       if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
@@ -735,16 +731,19 @@ totalFirst6 += first6;
     const mbFirst = document.getElementById('mFirst6')?.parentElement;
     const mbLater = document.getElementById('mLater')?.parentElement;
     if(mb && mbFirst && mbLater){
-    if(maxIntro>0){
-  mbFirst.style.display = '';
-  mbLater.querySelector('span').textContent = `${maxIntro+1}–24m`;
-  document.getElementById('mFirst6').textContent = `£${totalFirst6.toFixed(2)}`;
-  document.getElementById('mLater').textContent = `£${totalLater.toFixed(2)}`;
-}else{
-  mbFirst.style.display = 'none';
-  mbLater.querySelector('span').textContent = 'Total';
-  document.getElementById('mLater').textContent = `£${totalLater.toFixed(2)}`;
-}
+      if(maxIntro>0){
+        mbFirst.style.display = '';
+        // Update both period labels
+        mbFirst.querySelector('span').textContent = `1–${maxIntro}m`;
+        mbLater.querySelector('span').textContent = `${maxIntro+1}–24m`;
+        // Update values
+        document.getElementById('mFirst6').textContent = `£${totalFirst6.toFixed(2)}`;
+        document.getElementById('mLater').textContent = `£${totalLater.toFixed(2)}`;
+      }else{
+        mbFirst.style.display = 'none';
+        mbLater.querySelector('span').textContent = 'Total';
+        document.getElementById('mLater').textContent = `£${totalLater.toFixed(2)}`;
+      }
     }
   }
 
@@ -996,4 +995,3 @@ if (admin && adminRow) {
   </script>
 </body>
 </html>
-mp
