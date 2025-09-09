@@ -10,7 +10,7 @@
     :root{ --bg:#ECE4D8; --panel:#F6EEE3; --muted:#5b534a; --ink:#1a1917; --primary:#2f2a25; --primaryText:#fffaf5; --border:#E0D6C8; --accent:#ff7a59; --red:#d92d20; --amber:#b7791f; }
     *{box-sizing:border-box}
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:16px; }
-    header{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--border)}
+    header{position:static;top:auto;z-index:5;background:var(--panel);border-bottom:1px solid var(--border)}
     .bar{max-width:1842px;margin:auto;padding:14px 18px;display:flex;gap:12px;align-items:center}
     .ver{margin-left:8px;color:var(--muted);font-size:12px}
     h1{color:var(--ink);font-size:18px;margin:0;font-weight:700;letter-spacing:.3px}
@@ -127,28 +127,21 @@
       .card{padding:12px}
       header .row{gap:8px}
 
-      /* Larger readable base size on mobile */
-      body{ font-size:17px }
+      /* Smaller header on mobile */
+      header .bar{ padding:6px 10px }
+      header h1{ font-size:14px }
+      header .ver{ display:none }
+      header .row .btn{ padding:8px 10px; font-size:12px }
 
-      /* Buttons fill better and are touch-friendly */
-      .card .btn, .pcard .btn{ min-height:44px }
-      .pcard .btn{ width:100% }
-      .card div[style*="margin-top:auto"]{ display:flex }
-      .card div[style*="margin-top:auto"] .btn{ flex:1 }
-
-      /* Make filter chips horizontally scrollable instead of wrapping to multiple lines */
-      .filters .row{ overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px }
-      .filters .row::-webkit-scrollbar{ display:none }
-
-      /* Prevent hover effects on touch devices */
-      .card:hover, .pcard:hover{ transform:none; box-shadow:none }
-
-      /* Quantity field easier to tap */
-      .cart input[type="number"]{ height:44px }
+      /* Tiny sticky footer bar on mobile */
+      .mbar{ display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--panel); border-top:1px solid var(--border); padding:8px 10px; align-items:center; gap:10px; z-index:10 }
+      .mbar .tot{ display:flex; flex-direction:column; font-size:12px; line-height:1.2 }
+      .mbar .tot b{ font-size:13px }
+      .mbar .spacer{ flex:1 }
+      .mbar .btn{ min-height:36px }
+      body{ padding-bottom:64px } /* avoid content underlap */
     }
-    @media (hover: none){
-      .card:hover, .pcard:hover{ transform:none; box-shadow:none }
-    }
+    .mbar{ display:none }
   </style>
 </head>
 <body>
@@ -227,6 +220,12 @@
       <div class="total"><span>Months 7–24 per month</span><span id="grandLater">£0.00</span></div>
       <div class="rule">Rules enforced: (1) Multi‑SIM must be ≤ highest data in package. (2) Cross‑sell/X requires at least one non‑Multi, non‑X base plan.</div>
     </aside>
+    <div class="mbar" id="mobileBar">
+      <div class="tot"><span>1–6m</span><b id="mFirst6">£0.00</b></div>
+      <div class="tot"><span>7–24m</span><b id="mLater">£0.00</b></div>
+      <div class="spacer"></div>
+      <button class="btn" id="mScrollCart">Scroll to cart</button>
+    </div>
   </div>
 
   <script>
@@ -547,6 +546,8 @@ function packageFirst6(pkg){
     });
     document.getElementById('grandLater').textContent = `£${totalLater.toFixed(2)}`;
     document.getElementById('grandFirst6').textContent = `£${totalFirst6.toFixed(2)}`;
+    const mf = document.getElementById('mFirst6'); if(mf) mf.textContent = `£${totalFirst6.toFixed(2)}`;
+    const ml = document.getElementById('mLater'); if(ml) ml.textContent = `£${totalLater.toFixed(2)}`;
   }
 
   function card(p){
@@ -719,6 +720,9 @@ function packageFirst6(pkg){
   bindExportPinned();
   bindPinnedToggle();
   render();
+  document.getElementById('mScrollCart')?.addEventListener('click', ()=>{
+    document.querySelector('.cart')?.scrollIntoView({behavior:'smooth', block:'start'});
+  });
   async function updateTimestampFromGitHub(){
     try{
       const resp = await fetch('https://api.github.com/repos/JXHNWACK/1842/commits/main');
