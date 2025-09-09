@@ -1,6 +1,6 @@
 [
   {
-    "title": "2 UNLIMITED SIMS FOR £18 THEN £21.50",
+    "title": "2 UNLIMITED SIMS FOR £18 EACH THEN £21.50 EACH",
     "items": [
       {
         "name": "25GB Lite SIMO 24M",
@@ -17,24 +17,15 @@
     ]
   },
   {
-    "title": "Push: Unlimited Lite",
+    "title": "2x 160GB FOR £13.50 EACH FOR 6M THEN £17 EACH",
     "items": [
       {
-        "name": "Unlimited Lite SIMO 24M",
-        "qty": 1
-      }
-    ]
-  },
-  {
-    "title": "Push: 160GB Value + Multi 160GB",
-    "items": [
-      {
-        "name": "160GB Value SIMO 24M",
+        "name": "25GB Lite SIMO 24M",
         "qty": 1
       },
       {
         "name": "160GB Lite SIMO Multi SIM 24M",
-        "qty": 1
+        "qty": 2
       }
     ]
   }
