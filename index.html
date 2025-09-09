@@ -8,6 +8,9 @@
   <title>Leicester Gallowtree Gate – Package Builder / One Pager.</title>
   <style>
     :root{ --bg:#ECE4D8; --panel:#F6EEE3; --muted:#5b534a; --ink:#1a1917; --primary:#2f2a25; --primaryText:#fffaf5; --border:#E0D6C8; --accent:#ff7a59; --red:#d92d20; --amber:#b7791f; }
+    /* Dark/Warm theme */
+    body[data-theme="dark"]{ --bg:#1f1a16; --panel:#26201b; --muted:#c8bfb5; --ink:#fbf7f2; --primary:#f0e6db; --primaryText:#1f1a16; --border:#3a332c; --accent:#ff9a76; --red:#ff6b5a; --amber:#e0a44a; }
+    body[data-theme="dark"] .chip-accent{ color:#1f1a16 }
     *{box-sizing:border-box}
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:16px; }
     html, body{ max-width:100%; overflow-x:hidden }
@@ -241,6 +244,7 @@
       <span id="overridesBadge" class="chip-accent" style="display:none">Overrides active</span>
       <span id="pinnedBadge" class="chip-accent" style="display:none">Pinned active</span>
       <div class="row" style="margin-left:auto">
+        <button id="themeBtn" class="btn sec" title="Toggle theme">Theme</button>
         <button id="loginBtn" class="btn sec">Muhammad/Wade/Karin</button>
         <button id="exportBtn" class="btn">Export package</button>
         <button id="exportOverridesBtn" class="btn sec" style="display:none" title="Download overrides.json for GitHub">Export overrides</button>
@@ -248,6 +252,14 @@
       </div>
     </div>
   </header>
+
+  <div id="changelogBar" style="display:none;background:#fff7ed;border-bottom:1px solid var(--border);">
+    <div style="max-width:1842px;margin:auto;padding:8px 18px;display:flex;gap:10px;align-items:flex-start">
+      <strong style="color:var(--amber);font-size:12px;white-space:nowrap">Recent changes</strong>
+      <div id="changelogList" style="font-size:12px;color:var(--ink);"></div>
+      <button id="changelogClose" class="btn sec sm" style="margin-left:auto">Hide</button>
+    </div>
+  </div>
 
   <div class="wrap">
     <section class="filters">
@@ -321,6 +333,7 @@
       <div id="cartList"></div>
       <div class="total" id="rowFirst6"><span id="labelFirst6">Months 1–6 per month</span><span id="grandFirst6">£0.00</span></div>
       <div class="total" id="rowLater"><span id="labelLater">Months 7–24 per month</span><span id="grandLater">£0.00</span></div>
+      <div class="total" id="rowAvg"><span>Effective average (24m)</span><span id="avg24">£0.00</span></div>
       <div class="rule">Rules enforced: (1) Multi‑SIM must be ≤ highest data in package. (2) Cross‑sell/X requires at least one non‑Multi, non‑X base plan.</div>
     </aside>
     <div class="mbar" id="mobileBar">
@@ -698,14 +711,28 @@ const introSel = document.getElementById('introSel')?.value || '';
         packageItems = packageItems.filter(x=>x!==it);
         render();
       });
+      // Swipe to remove (mobile)
+      let sx = null, sy = null;
+      row.addEventListener('touchstart', (e)=>{
+        if(e.touches && e.touches[0]){ sx = e.touches[0].clientX; sy = e.touches[0].clientY; }
+      }, {passive:true});
+      row.addEventListener('touchend', (e)=>{
+        if(sx===null) return;
+        const t = (e.changedTouches && e.changedTouches[0]) || null;
+        if(!t) return; const dx = t.clientX - sx; const dy = t.clientY - sy; sx = sy = null;
+        if(Math.abs(dx) > 60 && Math.abs(dy) < 30){ // horizontal swipe
+          packageItems = packageItems.filter(x=>x!==it);
+          render();
+        }
+      });
       cartList.appendChild(row);
       const plan = plans.find(p=>p.name===it.name);
       const base = it.price*it.qty;
       const isIntro = (plan && plan.introMonths>0);
-const laterAdd = isIntro ? (base*2) : base;
-totalLater += laterAdd;
-const first6 = base; // intro period uses stored (half) price
-totalFirst6 += first6;
+      const laterAdd = isIntro ? (base*2) : base;
+      totalLater += laterAdd;
+      const first6 = base; // intro period uses stored (half) price
+      totalFirst6 += first6;
     });
     const maxIntro = packageItems.reduce((m,it)=>{
   const plan = plans.find(p=>p.name===it.name);
@@ -738,6 +765,17 @@ if (summaryEl) {
       if(rowFirst) rowFirst.style.display = 'none';
       if(labelLater) labelLater.textContent = 'Total per month';
       if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
+    }
+    // Effective average over 24 months
+    const avgEl = document.getElementById('avg24');
+    if(avgEl){
+      if(packageItems.length===0){ avgEl.textContent = '£0.00'; }
+      else if(maxIntro>0){
+        const eff = ((totalFirst6 * maxIntro) + (totalLater * (24 - maxIntro))) / 24;
+        avgEl.textContent = `£${eff.toFixed(2)}`;
+      }else{
+        avgEl.textContent = `£${totalLater.toFixed(2)}`;
+      }
     }
     // Mobile footer
     const mb = document.getElementById('mobileBar');
@@ -1007,6 +1045,44 @@ if (admin && adminRow) {
     }catch(e){ console.warn("Could not fetch commit info", e); }
   }
   updateTimestampFromGitHub();
+
+  // Theme toggle
+  (function(){
+    const key = 'theme';
+    const saved = localStorage.getItem(key);
+    if(saved){ document.body.setAttribute('data-theme', saved); }
+    const btn = document.getElementById('themeBtn');
+    if(btn){
+      btn.addEventListener('click', ()=>{
+        const cur = document.body.getAttribute('data-theme')==='dark' ? '' : 'dark';
+        if(cur) document.body.setAttribute('data-theme','dark'); else document.body.removeAttribute('data-theme');
+        localStorage.setItem(key, cur);
+      });
+    }
+  })();
+
+  async function loadChangelog(){
+    try{
+      const resp = await fetch('https://api.github.com/repos/JXHNWACK/1842/commits?per_page=3');
+      if(!resp.ok) return;
+      const items = await resp.json();
+      const list = document.getElementById('changelogList');
+      const bar = document.getElementById('changelogBar');
+      const close = document.getElementById('changelogClose');
+      if(!list || !bar) return;
+      const html = items.map(c=>{
+        const msg = (c.commit && c.commit.message ? c.commit.message.split('\n')[0] : 'Update');
+        const when = new Date(c.commit.committer.date).toLocaleString('en-GB',{ dateStyle:'short', timeStyle:'short' });
+        return `<div style="margin-right:14px;display:inline-block"><b>${msg}</b> <span style="color:var(--muted)">(${when})</span></div>`;
+      }).join('');
+      list.innerHTML = html;
+      bar.style.display = 'block';
+      if(close){ close.onclick = ()=> bar.style.display = 'none'; }
+      // Auto-hide after 15s on mobile
+      if(window.matchMedia('(max-width: 760px)').matches){ setTimeout(()=>{ bar.style.display='none'; }, 15000); }
+    }catch(e){ /* ignore */ }
+  }
+  loadChangelog();
   </script>
 </body>
 </html>
