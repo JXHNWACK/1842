@@ -242,7 +242,6 @@
       <span id="pinnedBadge" class="chip-accent" style="display:none">Pinned active</span>
       <div class="row" style="margin-left:auto">
         <button id="loginBtn" class="btn sec">Muhammad/Wade/Karin</button>
-        <button id="clearBtn" class="btn sec">Clear package</button>
         <button id="exportBtn" class="btn">Export package</button>
         <button id="exportOverridesBtn" class="btn sec" style="display:none" title="Download overrides.json for GitHub">Export overrides</button>
         <button id="reloadOverridesBtn" class="btn sec" style="display:none" title="Reload overrides.json">Reload overrides</button>
@@ -316,6 +315,9 @@
     <aside class="cart">
       <h2>Selected Package</h2>
       <div id="cartSummary" class="muted" style="margin-bottom:6px;font-size:12px"></div>
+      <div class="row" style="margin-bottom:8px; gap:8px">
+        <button id="clearBtnCart" class="btn sec sm">Clear package</button>
+      </div>
       <div id="cartList"></div>
       <div class="total" id="rowFirst6"><span id="labelFirst6">Months 1–6 per month</span><span id="grandFirst6">£0.00</span></div>
       <div class="total" id="rowLater"><span id="labelLater">Months 7–24 per month</span><span id="grandLater">£0.00</span></div>
@@ -325,6 +327,7 @@
       <div class="tot"><span>1–6m</span><b id="mFirst6">£0.00</b></div>
       <div class="tot"><span>7–24m</span><b id="mLater">£0.00</b></div>
       <div class="spacer"></div>
+      <button class="btn sec" id="mClear">Clear</button>
       <button class="btn" id="mScrollCart">Scroll to cart</button>
     </div>
   </div>
@@ -894,8 +897,10 @@ if (admin && adminRow) {
     return '';
   }
 
-  // controls
-['q','tier','data','flagX','flagS','flagMulti','introSel'].forEach(id=> document.getElementById(id)?.addEventListener('input',render));  document.getElementById('clearBtn').addEventListener('click',()=>{packageItems=[];render()});
+// controls
+['q','tier','data','flagX','flagS','flagMulti','introSel'].forEach(id=> document.getElementById(id)?.addEventListener('input',render));
+  document.getElementById('mClear')?.addEventListener('click', ()=>{ packageItems=[]; render(); });
+  document.getElementById('clearBtnCart')?.addEventListener('click', ()=>{ packageItems=[]; render(); });
   document.getElementById('exportBtn').addEventListener('click',()=>{
     // recompute totals for export (supports introMonths 6/9/12 and legacy half6)
     let totalLater=0, totalFirst=0;
@@ -1001,7 +1006,7 @@ if (admin && adminRow) {
       if(el) el.textContent = "• last updated " + formatted;
     }catch(e){ console.warn("Could not fetch commit info", e); }
   }
-  uupdateTimestampFromGitHub();
+  updateTimestampFromGitHub();
   </script>
 </body>
 </html>
