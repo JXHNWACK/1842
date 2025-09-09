@@ -100,7 +100,7 @@
     .tags{display:flex;gap:6px;flex-wrap:wrap}
     .tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:#faf3eb;color:#2b2622}
     .tag.teal{border-color:#ffe2d6;color:#b94a32;background:#fff0ea}
-    .tag.half{border-color:#e6d4b8;background:#f7ecd9;color:#6b4f2a}
+    .tag.half{border-color:#34d399;background:#ecfdf5;color:#065f46;box-shadow:0 0 0 2px rgba(52,211,153,.25),0 0 8px rgba(52,211,153,.35)}
     .card h3{color:var(--ink);margin:0;font-size:15px;line-height:1.2}
     .price{color:var(--primary);font-weight:800;font-size:20px}
     .muted{color:var(--muted);font-size:13px}
@@ -111,6 +111,8 @@
     .btn.sec{background:#fff;border:1px solid var(--border);color:var(--ink)}
     .btn.danger{background:var(--red);border:1px solid var(--red);color:#fff}
     .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn.toggle{ background:#fff; border:1px solid var(--border); color:var(--ink) }
+    .btn.toggle.on{ background:#10b981; border-color:#10b981; color:#fff }
 
     .cart{padding:14px;position:sticky;top:74px;align-self:start; grid-column:2;}
     .cart h2{margin:0 0 10px;color:var(--ink);font-size:16px}
@@ -333,7 +335,11 @@
       <div class="total" id="rowFirst6"><span id="labelFirst6">Months 1–6 per month</span><span id="grandFirst6">£0.00</span></div>
       <div class="total" id="rowLater"><span id="labelLater">Months 7–24 per month</span><span id="grandLater">£0.00</span></div>
       <div class="total" id="rowAvg"><span>Effective average (24m)</span><span id="avg24">£0.00</span></div>
-      <div class="rule">Rules enforced: (1) Multi‑SIM must be ≤ highest data in package. (2) Cross‑sell/X requires at least one non‑Multi, non‑X base plan.</div>
+      <div class="row" id="overrideRow" style="margin-top:8px; gap:8px; align-items:center">
+        <button id="overrideBtn" class="btn toggle sm" title="Allow Multi‑SIM and X without base">Override rules (existing customer): OFF</button>
+        <span class="muted" style="font-size:11px">Allows Multi‑SIM and X without base plan.</span>
+      </div>
+      <div class="rule" id="rulesNote">Rules enforced: (1) Multi‑SIM must be ≤ highest data in package. (2) Cross‑sell/X requires at least one non‑Multi, non‑X base plan.</div>
     </aside>
     <div class="mbar" id="mobileBar">
       <div class="tot"><span>1–6m</span><b id="mFirst6">£0.00</b></div>
@@ -652,7 +658,7 @@ for(const p of plans){ if(introByName[p.name]) p.introMonths = Number(introByNam
   const grid = document.getElementById('grid');
   const cartList = document.getElementById('cartList');
   const grand = document.getElementById('grand');
-  let admin=false; let packageItems=[];
+  let admin=false; let packageItems=[]; let overrideRules = false;
 
   function render(){
     // filters
@@ -745,6 +751,13 @@ if (summaryEl) {
     summaryEl.textContent = `Intro £${totalFirst6.toFixed(2)} → Later £${totalLater.toFixed(2)}`;
   } else {
     summaryEl.textContent = '';
+    // Update rules note for override
+    const rn = document.getElementById('rulesNote');
+    if(rn){
+      rn.textContent = overrideRules
+        ? 'Override ACTIVE: Multi‑SIM and X rules are bypassed for existing customers.'
+        : 'Rules enforced: (1) Multi‑SIM must be ≤ highest data in package. (2) Cross‑sell/X requires at least one non‑Multi, non‑X base plan.';
+    }
   }
 }
     const rowFirst = document.getElementById('rowFirst6');
@@ -915,6 +928,7 @@ if (admin && adminRow) {
   }
 
   function canAdd(p){
+    if(overrideRules) return {allowed:true};
     if(p.multi){
       const baseMax = highestData();
       if(!hasBase()) return {allowed:false, reason:'Add a base SIM plan first before Multi‑SIM.'};
@@ -1028,6 +1042,19 @@ if (admin && adminRow) {
   bindReloadOverrides();
   bindPinnedToggle();
   render();
+  // Bind override button toggle
+  const obtn = document.getElementById('overrideBtn');
+  if(obtn){
+    const syncBtn = ()=>{
+      obtn.textContent = `Override rules (existing customer): ${overrideRules?'ON':'OFF'}`;
+      obtn.classList.toggle('on', overrideRules);
+    };
+    obtn.addEventListener('click', ()=>{ overrideRules = !overrideRules; sessionStorage.setItem('overrideRules', overrideRules? '1':'0'); syncBtn(); render(); });
+    // restore from session
+    const savedOv = sessionStorage.getItem('overrideRules');
+    if(savedOv){ overrideRules = (savedOv==='1'); }
+    syncBtn();
+  }
   document.getElementById('mScrollCart')?.addEventListener('click', ()=>{
     document.querySelector('.cart')?.scrollIntoView({behavior:'smooth', block:'start'});
   });
