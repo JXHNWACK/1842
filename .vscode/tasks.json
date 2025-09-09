@@ -18,6 +18,22 @@
       "problemMatcher": []
     },
     {
+      "label": "Import overrides.json from Downloads & deploy",
+      "type": "shell",
+      "command": "if [ -f \"$HOME/Downloads/overrides.json\" ]; then mv -f \"$HOME/Downloads/overrides.json\" .; else echo 'No overrides.json in Downloads'; fi && git add overrides.json && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m 'Update overrides') && git pull --rebase --autostash origin main && git push origin main",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Import pinned.json from Downloads & deploy",
+      "type": "shell",
+      "command": "if [ -f \"$HOME/Downloads/pinned.json\" ]; then mv -f \"$HOME/Downloads/pinned.json\" .; else echo 'No pinned.json in Downloads'; fi && git add pinned.json && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m 'Update pinned packages') && git pull --rebase --autostash origin main && git push origin main",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
       "label": "Show git remotes",
       "type": "shell",
       "command": "git remote -v && git branch -vv && git status",
