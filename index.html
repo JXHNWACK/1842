@@ -64,6 +64,19 @@
     .pedit .hint{color:var(--muted);font-size:12px;margin-bottom:6px}
     .pedit textarea{width:100%;min-height:140px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--ink);padding:10px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-size:12px}
     .pedit .row{display:flex;gap:8px;margin-top:8px}
+    /* Quick tariffs bar */
+    .quickbar{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin:12px 0 }
+    .quickbar h3{ margin:0 0 8px; font-size:13px; color:var(--ink) }
+    .qscroll{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin }
+    .qscroll::-webkit-scrollbar{ height:8px }
+    .qscroll::-webkit-scrollbar-thumb{ background:#0002; border-radius:8px }
+    .qcard{ min-width:210px; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:8px; flex:0 0 auto; display:flex; flex-direction:column; gap:6px }
+    .qcard .qname{ font-size:12.5px; font-weight:700; color:var(--ink); line-height:1.2 }
+    .qcard .qmeta{ font-size:11px; color:var(--muted) }
+    .qcard .qprice{ font-weight:800; color:var(--primary) }
+    .qcard .row{ display:flex; gap:6px }
+    .qcard .tags{ gap:4px }
+    .qcard .btn.sm{ padding:6px 8px; font-size:12px }
 
     .catalog{padding:12px; grid-column:1;}
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -106,10 +119,13 @@
     }
     .tags{display:flex;gap:6px;flex-wrap:wrap}
     .tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:#faf3eb;color:#2b2622}
-    .tag.teal{border-color:#ffe2d6;color:#b94a32;background:#fff0ea}
+    .tag.multi{border-color:#38bdf8;background:#ecfeff;color:#075985;box-shadow:0 0 0 2px rgba(56,189,248,.25),0 0 8px rgba(56,189,248,.35)}
+    .tag.x{border-color:#fb923c;background:#fff7ed;color:#7c2d12;box-shadow:0 0 0 2px rgba(251,146,60,.25),0 0 8px rgba(251,146,60,.35)}
+    .tag.student{border-color:#a78bfa;background:#f5f3ff;color:#3730a3;box-shadow:0 0 0 2px rgba(167,139,250,.25),0 0 8px rgba(167,139,250,.35)}
     .tag.half{border-color:#34d399;background:#ecfdf5;color:#065f46;box-shadow:0 0 0 2px rgba(52,211,153,.25),0 0 8px rgba(52,211,153,.35)}
     .card h3{color:var(--ink);margin:0;font-size:15px;line-height:1.2}
     .price{color:var(--primary);font-weight:800;font-size:20px}
+    .save{ color:var(--accent); font-weight:800; font-size:12px }
     .muted{color:var(--muted);font-size:13px}
     .features{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:12px;margin-top:6px}
     .btn{background:var(--primary);border:1px solid var(--primary);color:var(--primaryText);font-weight:700;border-radius:10px;padding:10px 12px;cursor:pointer}
@@ -124,6 +140,9 @@
     .cart{padding:14px;position:sticky;top:74px;align-self:start; grid-column:2;}
     .cart h2{margin:0 0 10px;color:var(--ink);font-size:16px}
     .cart .item{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;border-top:1px dashed #2a365b;padding-top:10px;margin-top:10px}
+    .qty{ display:inline-flex; gap:6px; align-items:center }
+    .qty .btn.sm{ padding:6px 8px }
+    .cart input[type="number"]{ width:60px; height:36px }
     .cart .item .name{color:var(--ink);font-size:13px}
     .cart .item .note{color:var(--amber);font-size:11px}
     .total{display:flex;justify-content:space-between;border-top:2px solid var(--border);margin-top:12px;padding-top:12px;color:var(--ink);font-weight:800}
@@ -228,6 +247,7 @@
       .cart .item .name{ font-size:12px }
       .cart .item .note{ font-size:10px }
       .cart input[type="number"]{ width:50px; height:36px }
+      .qty .btn{ padding:6px 8px }
       .total{ font-size:14px }
       .rule{ font-size:11px }
 
@@ -311,6 +331,11 @@
       </div>
     </section>
 
+    <div class="quickbar">
+      <h3>Quick tariffs (first 12 from filters)</h3>
+      <div id="quickBar" class="qscroll"></div>
+    </div>
+
     <section class="pinned" id="pinnedSection">
       <h2>📌 PINNED PACKAGES
         <span class="chip-accent">Recommended</span>
@@ -342,6 +367,7 @@
     <aside class="cart">
       <h2>Selected Package</h2>
       <div id="cartSummary" class="muted" style="margin-bottom:6px;font-size:12px"></div>
+      <div id="cartSavings" class="chip-accent" style="display:none;margin-bottom:8px;font-size:12px"></div>
       <div class="row" style="margin-bottom:8px; gap:8px">
         <button id="clearBtnCart" class="btn sec sm">Clear package</button>
       </div>
@@ -367,6 +393,41 @@
 
   <script>
   // ——— Data ———
+  function renderQuickBar(list){
+    const wrap = document.getElementById('quickBar');
+    if(!wrap) return;
+    wrap.innerHTML = '';
+    list.slice(0,12).forEach(p=>{
+      const flags = [];
+      if(p.multi) flags.push('<span class="tag multi">Multi‑SIM</span>');
+      if(p.x) flags.push('<span class="tag x">X</span>');
+      if(p.student) flags.push('<span class="tag student">Student</span>');
+      if(p.introMonths>0) flags.push(`<span class="tag half">Intro ${p.introMonths}m 1/2</span>`);
+      const div = document.createElement('div');
+      div.className = 'qcard';
+      div.innerHTML = `
+        <div class="qname">${p.name}</div>
+        <div class="tags">${flags.join('')}</div>
+        <div class="qmeta">Data: <b>${p.data}</b> • ${p.tier}</div>
+        <div class="row" style="align-items:center; justify-content:space-between">
+          <div class="qprice">£${p.price.toFixed(2)}</div>
+          <div class="row">
+            <button class="btn sm">Add</button>
+            <button class="btn sec sm">Add ×2</button>
+          </div>
+        </div>`;
+      const add = (qty)=>{
+        const ok = canAdd(p);
+        if(!ok.allowed){ alert(ok.reason); return; }
+        const existing = packageItems.find(x=>x.id===p.id);
+        if(existing) existing.qty += qty; else packageItems.push({id:p.id,name:p.name,price:p.price,qty, note:noteFor(p)});
+        render();
+      };
+      div.querySelector('.btn.sm').addEventListener('click', ()=>add(1));
+      div.querySelector('.btn.sec.sm').addEventListener('click', ()=>add(2));
+      wrap.appendChild(div);
+    });
+  }
   // NOTE: You can edit prices live in Admin mode, and they persist in localStorage.
   const ADMIN_PASS = "1842"; // change this to your preferred password
   const DESIGN_VERSION = "v1.0-2025-09-08"; // Design freeze identifier
@@ -701,6 +762,7 @@ const introSel = document.getElementById('introSel')?.value || '';
 
     grid.innerHTML = '';
     filtered.forEach(p=> grid.appendChild(card(p)) );
+    renderQuickBar(filtered);
     renderPinned();
 
     // Cart
@@ -714,8 +776,10 @@ const introSel = document.getElementById('introSel')?.value || '';
           <div class="name">${it.name}</div>
           ${it.note?`<div class="note">${it.note}</div>`:''}
         </div>
-        <div>
-          <input type="number" min="1" value="${it.qty}" style="width:60px" />
+        <div class="qty">
+          <button class="btn sec sm qminus" title="Decrease">−</button>
+          <input type="number" min="1" value="${it.qty}" />
+          <button class="btn sec sm qplus" title="Increase">+</button>
         </div>
         <div style="display:flex;gap:6px;align-items:center">
           <div>£${(it.price*it.qty).toFixed(2)}</div>
@@ -726,8 +790,10 @@ const introSel = document.getElementById('introSel')?.value || '';
         it.qty = Math.max(1, Number(e.target.value||1));
         render();
       });
+      row.querySelector('.qminus').addEventListener('click',()=>{ it.qty = Math.max(1, (it.qty||1)-1); render(); });
+      row.querySelector('.qplus').addEventListener('click',()=>{ it.qty = (it.qty||1)+1; render(); });
       // remove
-      row.querySelector('button').addEventListener('click',()=>{
+      row.querySelector('button.btn.danger').addEventListener('click',()=>{
         packageItems = packageItems.filter(x=>x!==it);
         render();
       });
@@ -793,6 +859,18 @@ if (summaryEl) {
       if(labelLater) labelLater.textContent = 'Total per month';
       if(gLater) gLater.textContent = `£${totalLater.toFixed(2)}`;
     }
+    // Savings badge for intro period
+    const sEl = document.getElementById('cartSavings');
+    if(sEl){
+      if(maxIntro>0){
+        const savePerMonth = Math.max(0, totalLater - totalFirst6);
+        const saveTotal = savePerMonth * maxIntro;
+        sEl.textContent = `Save £${saveTotal.toFixed(2)} over first ${maxIntro} months`;
+        sEl.style.display = 'inline-block';
+      }else{
+        sEl.style.display = 'none';
+      }
+    }
     // Effective average over 24 months
     const avgEl = document.getElementById('avg24');
     if(avgEl){
@@ -829,9 +907,9 @@ if (summaryEl) {
     const el = document.createElement('div');
     el.className='card';
     const flags = [];
-    if(p.multi) flags.push('<span class="tag teal">Multi‑SIM</span>');
-    if(p.x) flags.push('<span class="tag teal">X</span>');
-    if(p.student) flags.push('<span class="tag teal">Student</span>');
+    if(p.multi) flags.push('<span class="tag multi">Multi‑SIM</span>');
+    if(p.x) flags.push('<span class="tag x">X</span>');
+    if(p.student) flags.push('<span class="tag student">Student</span>');
     if(p.introMonths>0) flags.push(`<span class="tag half">Intro ${p.introMonths}m 1/2</span>`);
 
     const priceField = admin ? `<input class="editable" type="number" step="0.01" value="${p.price}" style="width:110px;padding:8px;border-radius:8px;color:var(--ink)" />`
@@ -842,6 +920,7 @@ if (summaryEl) {
       <h3>${p.name}</h3>
       <div class="muted">Data: <b>${p.data}</b> • Tier: <b>${p.tier}</b></div>
       <div>From ${priceField} /month</div>
+      ${p.introMonths>0?`<div class="save">Save £${p.price.toFixed(2)} for ${p.introMonths}m</div>:''}
       <div style="display:flex;gap:8px;margin-top:auto">
         <button class="btn">Add</button>
         <button class="btn sec" title="Add & duplicate">Add ×2</button>
