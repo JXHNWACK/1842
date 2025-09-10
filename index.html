@@ -45,7 +45,16 @@
     #pinnedBadge { font-size: 11px; padding: 2px 6px; border-radius: 6px }
     
     /* Pinned packages */
-    .pinned{background:#fdf8f5;border:1px solid var(--border);border-radius:12px;padding:12px 12px;margin-top:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);border-left:8px solid var(--accent); grid-column:1}
+    .pinned{
+      background: linear-gradient(180deg, #fff4ec 0%, #fdf8f5 60%);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px 12px;
+      margin-top:12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 0 0 4px rgba(255,122,89,0.08);
+      border-left:8px solid var(--accent);
+      grid-column:1
+    }
     .pinned h2{font-size:14px;color:var(--ink);margin:0 0 8px;display:flex;align-items:center;gap:8px}
     .pinned .actions{margin-left:auto;display:flex;gap:8px}
     .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -53,6 +62,8 @@
     @media (max-width:680px){.pgrid{grid-template-columns:1fr}}
     .pcard{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
     .pcard:hover{box-shadow:0 2px 12px rgba(0,0,0,0.08);transform:translateY(-2px)}
+    @keyframes pinIn{ from{ opacity:0; transform:translateY(6px) } to{ opacity:1; transform:none } }
+    .pcard.appear{ animation: pinIn .35s ease both }
     .pcard .ptitle{font-weight:700;color:var(--ink);font-size:13px}
     .plist{color:var(--muted);font-size:12px;line-height:1.35}
     .prow{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
@@ -533,6 +544,9 @@ function packageFirst6(pkg){
 </div>
           <button class="btn">Add package</button>
         </div>`;
+      // animation: make pinned cards fade/slide in with a slight stagger
+      div.classList.add('appear');
+      div.style.animationDelay = (idx*70)+'ms';
       div.querySelector('.btn').addEventListener('click',()=>addPinnedToCart(pkg));
       const delBtn = div.querySelector('.del');
       if(admin){ delBtn.style.display='inline'; }
