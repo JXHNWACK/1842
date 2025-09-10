@@ -920,7 +920,7 @@ if (summaryEl) {
       <h3>${p.name}</h3>
       <div class="muted">Data: <b>${p.data}</b> • Tier: <b>${p.tier}</b></div>
       <div>From ${priceField} /month</div>
-      ${p.introMonths>0?`<div class="save">Save £${p.price.toFixed(2)} for ${p.introMonths}m</div>:''}
+      ${p.introMonths>0 ? `<div class="save">Save £${p.price.toFixed(2)} for ${p.introMonths}m</div>` : ''}
       <div style="display:flex;gap:8px;margin-top:auto">
         <button class="btn">Add</button>
         <button class="btn sec" title="Add & duplicate">Add ×2</button>
