@@ -273,6 +273,18 @@
       body{ padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) }
       .mbar{ padding-bottom: env(safe-area-inset-bottom, 0px); z-index: 999 }
     }
+    /* Welcome overlay */
+    .welcome-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.35); backdrop-filter:saturate(120%) blur(4px); z-index:2000; display:none }
+    .welcome{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:2001 }
+    .welcome .panel{ max-width:520px; width:92vw; background:linear-gradient(180deg,#fff7f1 0%, #f6eee3 100%); border:1px solid var(--border); border-radius:16px; box-shadow:0 14px 44px rgba(0,0,0,.18), 0 0 0 4px rgba(255,122,89,.08); padding:18px }
+    .welcome h2{ margin:0 0 8px; font-size:18px; color:var(--ink); display:flex; align-items:center; gap:10px; }
+    .welcome h2::after{ content:""; flex:1; height:2px; background:var(--accent); border-radius:2px }
+    .welcome p{ margin:6px 0; color:var(--muted); font-size:13px }
+    .welcome .tips{ background:var(--panel); border:1px dashed var(--border); border-radius:12px; padding:10px; margin:10px 0; font-size:12px; color:var(--ink) }
+    .welcome .row{ display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:10px }
+    .welcome .muted{ font-size:12px }
+    body.modal-open{ overflow:hidden }
+    @media (max-width:760px){ .welcome .panel{ padding:14px } .welcome h2{ font-size:16px } }
   </style>
 </head>
 <body>
@@ -297,7 +309,22 @@
       <div id="changelogList" style="font-size:12px;color:var(--ink);"></div>
       <button id="changelogClose" class="btn sec sm" style="margin-left:auto">Hide</button>
     </div>
-  </div>
+    <div class="welcome-backdrop" id="welcomeBackdrop"></div>
+    <div class="welcome" id="welcome">
+      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+        <h2 id="welcomeTitle">Welcome to Leicester Gallowtree Gate</h2>
+        <p style="font-weight:600;color:var(--ink)">Package Builder / One Pager</p>
+        <div class="tips">
+          <div>• Tap a card to add. Use <b>Override</b> for existing customers.</div>
+          <div>• Sticky footer shows live totals. “Scroll to cart” jumps to the basket.</div>
+          <div>• Pinned packages are what we’re pushing today.</div>
+        </div>
+        <label class="chip" style="user-select:none"><input id="welcomeDontShow" type="checkbox" /> Don’t show again on this device</label>
+        <div class="row">
+          <button id="welcomeStart" class="btn">Start</button>
+        </div>
+      </div>
+    </div>
 
   <div class="wrap">
     <section class="filters">
@@ -1194,6 +1221,34 @@ if (admin && adminRow) {
     }catch(e){ /* ignore */ }
   }
   loadChangelog();
+  // —— Welcome overlay ——
+  function openWelcome(){
+    document.getElementById('welcomeBackdrop').style.display='block';
+    document.getElementById('welcome').style.display='flex';
+    document.body.classList.add('modal-open');
+    setTimeout(()=>{ document.getElementById('welcomeStart')?.focus(); }, 50);
+  }
+  function closeWelcome(){
+    document.getElementById('welcomeBackdrop').style.display='none';
+    document.getElementById('welcome').style.display='none';
+    document.body.classList.remove('modal-open');
+  }
+  (function initWelcome(){
+    const dismissed = localStorage.getItem('welcomeDismissed')==='1';
+    if(!dismissed){ openWelcome(); }
+    const startBtn = document.getElementById('welcomeStart');
+    const cb = document.getElementById('welcomeDontShow');
+    if(startBtn){
+      startBtn.addEventListener('click',()=>{
+        if(cb && cb.checked){ localStorage.setItem('welcomeDismissed','1'); }
+        closeWelcome();
+      });
+    }
+    // Allow clicking backdrop to close
+    document.getElementById('welcomeBackdrop')?.addEventListener('click', closeWelcome);
+    // ESC to close
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && document.getElementById('welcome').style.display==='flex'){ closeWelcome(); } });
+  })();
   </script>
 </body>
 </html>
