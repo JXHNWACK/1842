@@ -296,7 +296,7 @@
       <span id="pinnedBadge" class="chip-accent" style="display:none">Pinned active</span>
       <div class="row" style="margin-left:auto">
         <button id="loginBtn" class="btn sec">Muhammad/Wade/Karin</button>
-        <button id="exportBtn" class="btn">Export package</button>
+        <button id="exportBtn" class="btn" style="display:none">Export package</button>
         <button id="exportOverridesBtn" class="btn sec" style="display:none" title="Download overrides.json for GitHub">Export overrides</button>
         <button id="reloadOverridesBtn" class="btn sec" style="display:none" title="Reload overrides.json">Reload overrides</button>
       </div>
@@ -464,7 +464,7 @@
       const data = await resp.json();
       if(Array.isArray(data)){
         PINNED = data;
-        const pb = document.getElementById('pinnedBadge'); if(pb) pb.style.display='inline-block';
+        window.__hasPinnedShared = true; if(typeof updateAdminUI==='function') updateAdminUI();
         renderPinned();
       }
     }catch(e){ /* ignore if not present */ }
@@ -478,12 +478,9 @@
       if(!resp.ok) return; // no shared overrides file present
       const data = await resp.json();
       const stats = applyOverrides(data);
-      // Show badge with stats
-      const badge=document.getElementById('overridesBadge');
-      if(badge){
-        badge.style.display='inline-block';
-        badge.textContent = `Overrides active (${stats.priceUpdates} prices, ${stats.introUpdates} intro)`;
-      }
+      // Defer badge to admin mode
+      window.__hasOverrides = { priceUpdates: stats.priceUpdates, introUpdates: stats.introUpdates };
+      if(typeof updateAdminUI==='function') updateAdminUI();
       render();
     }catch(e){ console.warn('overrides.json not loaded', e); }
   }
@@ -738,6 +735,26 @@ for(const p of plans){ if(introByName[p.name]) p.introMonths = Number(introByNam
   const cartList = document.getElementById('cartList');
   const grand = document.getElementById('grand');
   let admin=false; let packageItems=[]; let overrideRules = false;
+
+  function updateAdminUI(){
+    const isAdmin = admin === true;
+    // Export package visibility
+    const ex = document.getElementById('exportBtn');
+    if (ex) ex.style.display = isAdmin ? 'inline-block' : 'none';
+
+    // Badges only visible to admin, and only if data present
+    const pb = document.getElementById('pinnedBadge');
+    const ob = document.getElementById('overridesBadge');
+    if (pb) pb.style.display = (isAdmin && window.__hasPinnedShared) ? 'inline-block' : 'none';
+    if (ob){
+      if (isAdmin && window.__hasOverrides){
+        ob.style.display = 'inline-block';
+        ob.textContent = `Overrides active (${window.__hasOverrides.priceUpdates} prices, ${window.__hasOverrides.introUpdates} intro)`;
+      } else {
+        ob.style.display = 'none';
+      }
+    }
+  }
 
   function render(){
     // filters
@@ -1095,6 +1112,7 @@ if (admin && adminRow) {
       const ro=document.getElementById('reloadOverridesBtn'); if(ro) ro.style.display='none';
       closePinnedEditor();
       render();
+      updateAdminUI();
       return;
     }
     const pw = prompt('Enter admin password');
@@ -1107,6 +1125,7 @@ if (admin && adminRow) {
       const eo=document.getElementById('exportOverridesBtn'); if(eo) eo.style.display='inline-block';
       const ro=document.getElementById('reloadOverridesBtn'); if(ro) ro.style.display='inline-block';
       render();
+      updateAdminUI();
     }
     else if(pw!==null){ alert('Incorrect password'); }
   });
@@ -1148,6 +1167,7 @@ if (admin && adminRow) {
   bindReloadOverrides();
   bindPinnedToggle();
   render();
+  updateAdminUI();
   // Bind override buttons (desktop cart + mobile footer)
   const obtn = document.getElementById('overrideBtn');
   const mobOv = document.getElementById('mOverride');
