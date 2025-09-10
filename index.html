@@ -76,6 +76,11 @@
     .pcard:hover{box-shadow:0 2px 12px rgba(0,0,0,0.08);transform:translateY(-2px)}
     @keyframes pinIn{ from{ opacity:0; transform:translateY(6px) } to{ opacity:1; transform:none } }
     .pcard.appear{ animation: pinIn .35s ease both }
+    @keyframes pinnedGlow {
+      0%,100% { box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 0 0 4px rgba(255,122,89,0.10); }
+      50%     { box-shadow: 0 12px 28px rgba(0,0,0,0.12), 0 0 0 10px rgba(255,122,89,0.22); }
+    }
+    .pinned.glow { animation: pinnedGlow 2.4s ease-in-out infinite; }
     .pcard .ptitle{font-weight:700;color:var(--ink);font-size:13px}
     .plist{color:var(--muted);font-size:12px;line-height:1.35}
     .prow{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
@@ -560,6 +565,11 @@ function packageFirst6(pkg){
   function renderPinned(){
     const wrap = document.getElementById('pinned');
     if(!wrap) return;
+    const section = document.getElementById('pinnedSection');
+    if(section){
+      if (PINNED && PINNED.length > 0) section.classList.add('glow');
+      else section.classList.remove('glow');
+    }
     wrap.innerHTML = '';
     PINNED.forEach((pkg, idx)=>{
       const div = document.createElement('div');
