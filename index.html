@@ -72,15 +72,29 @@
     .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     @media (max-width:1060px){.pgrid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:680px){.pgrid{grid-template-columns:1fr}}
-    .pcard{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
+    .pcard{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;position:relative}
     .pcard:hover{box-shadow:0 2px 12px rgba(0,0,0,0.08);transform:translateY(-2px)}
     @keyframes pinIn{ from{ opacity:0; transform:translateY(6px) } to{ opacity:1; transform:none } }
     .pcard.appear{ animation: pinIn .35s ease both }
-    @keyframes pinnedGlow {
-      0%,100% { box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 0 0 4px rgba(255,122,89,0.10); }
-      50%     { box-shadow: 0 12px 28px rgba(0,0,0,0.12), 0 0 0 10px rgba(255,122,89,0.22); }
+    /* Gentle pulse for individual pinned cards */
+    @keyframes pcardPulse {
+      0%,100% { box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+      50%     { box-shadow: 0 3px 10px rgba(0,0,0,0.10); }
     }
-    .pinned.glow { animation: pinnedGlow 2.4s ease-in-out infinite; }
+    .pcard.pulse { animation: pcardPulse 4.5s ease-in-out infinite; }
+    /* Corner ribbon for pinned cards */
+    .pcard .ribbon{
+      position:absolute; top:8px; right:8px;
+      background: linear-gradient(180deg, var(--accent), #ff8e73);
+      color:#fff; font-size:10px; font-weight:700;
+      padding:3px 7px; border-radius:999px; letter-spacing:.2px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
+    @keyframes pinnedGlow {
+      0%,100% { box-shadow: 0 6px 18px rgba(0,0,0,0.06), 0 0 0 3px rgba(255,122,89,0.10); }
+      50%     { box-shadow: 0 10px 22px rgba(0,0,0,0.09), 0 0 0 7px rgba(255,122,89,0.16); }
+    }
+    .pinned.glow { animation: pinnedGlow 3s ease-in-out infinite; }
     .pcard .ptitle{font-weight:700;color:var(--ink);font-size:13px}
     .plist{color:var(--muted);font-size:12px;line-height:1.35}
     .prow{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
@@ -573,12 +587,13 @@ function packageFirst6(pkg){
     wrap.innerHTML = '';
     PINNED.forEach((pkg, idx)=>{
       const div = document.createElement('div');
-      div.className = 'pcard';
+      div.className = 'pcard pulse';
       const lines = pkg.items.map(it=>`${it.qty||1}× ${it.name}`).join('<br>');
       const later = packageTotal(pkg).toFixed(2);
       const first6 = packageFirst6(pkg).toFixed(2);
       const maxIntro = Math.max(0, ...pkg.items.map(it=>{ const pp = plans.find(x=>x.name===it.name); return pp && pp.introMonths ? pp.introMonths : 0; }));
       div.innerHTML = `
+        <div class="ribbon">📌 Pinned</div>
         <div class="top">
           <div class="ptitle">${pkg.title}</div>
           <button class="del" title="Remove">✕</button>

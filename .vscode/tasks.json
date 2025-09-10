@@ -1,10 +1,18 @@
 {
   "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "Commit message",
+      "default": "Update build"
+    }
+  ],
   "tasks": [
     {
       "label": "Deploy to GitHub",
       "type": "shell",
-      "command": "git add . && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m 'Update build') && git pull --rebase --autostash origin main && git push origin main",
+      "command": "git add . && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m \"${input:commitMessage}\") && git pull --rebase --autostash origin main && git push origin main",
       "options": { "cwd": "${workspaceFolder}" },
       "group": { "kind": "build", "isDefault": true },
       "problemMatcher": []
