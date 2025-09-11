@@ -500,7 +500,15 @@ try{
       if(!resp.ok) return; // no shared file present
       const data = await resp.json();
       if(Array.isArray(data)){
-        PINNED = data;
+        const DEFAULT_BANNERS_BY_TITLE = {
+          'Unlimited Lite':'🔥 Hot Deal',
+          '160GB Value + Multi 160GB':'⭐ Staff Pick',
+          '250GB Value':'💡 Recommended'
+        };
+        PINNED = data.map(pkg => ({
+          ...pkg,
+          banner: pkg.banner || DEFAULT_BANNERS_BY_TITLE[pkg.title] || '📌 Pinned'
+        }));
         window.__hasPinnedShared = true; if(typeof updateAdminUI==='function') updateAdminUI();
         renderPinned();
       }
