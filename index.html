@@ -618,10 +618,12 @@ function packageFirst6(pkg){
       const later = packageTotal(pkg).toFixed(2);
       const first6 = packageFirst6(pkg).toFixed(2);
       const maxIntro = Math.max(0, ...pkg.items.map(it=>{ const pp = plans.find(x=>x.name===it.name); return pp && pp.introMonths ? pp.introMonths : 0; }));
+      const bannerText = (pkg.banner && String(pkg.banner).trim()) || (pkg.title && String(pkg.title).trim()) || '📌 Pinned';
+      const showTitle = !(bannerText && pkg.title && String(bannerText).trim() === String(pkg.title).trim());
       div.innerHTML = `
-        <div class="banner">${pkg.banner || '📌 Pinned'}</div>
+        <div class="banner">${bannerText}</div>
         <div class="top">
-          <div class="ptitle">${pkg.title}</div>
+          ${showTitle ? `<div class="ptitle">${pkg.title||''}</div>` : ''}
           <button class="del" title="Remove">✕</button>
         </div>
         <div class="plist">${lines}</div>
