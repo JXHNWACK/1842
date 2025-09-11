@@ -405,7 +405,7 @@
       </h2>
       <div id="pinned" class="pgrid"></div>
       <div id="pinnedEditor" class="pedit">
-        <div class="hint">Admin-only. Edit JSON, then Save. Structure: <code>[{ title, items:[{ name, qty }] }]</code></div>
+        <div class="hint">Admin-only. Edit JSON, then Save. Structure: <code>[{ title, <b>banner?</b>, items:[{ name, qty }] }]</code></div>
         <textarea id="pinnedTextarea"></textarea>
         <div class="row">
           <button id="pinnedSave" class="btn sm">Save</button>
@@ -475,11 +475,23 @@
       banner: '💡 Recommended'
     }
   ];
-  // Load saved pinned packages if present
-  try{
-    const savedPinned = JSON.parse(localStorage.getItem('pinnedPackages')||'null');
-    if(Array.isArray(savedPinned)) PINNED = savedPinned;
-  }catch{ /* ignore parse errors */ }
+  // Load saved pinned packages if present (migrate missing banner fields)
+try{
+  const savedPinned = JSON.parse(localStorage.getItem('pinnedPackages')||'null');
+  if(Array.isArray(savedPinned)){
+    const DEFAULT_BANNERS_BY_TITLE = {
+      'Unlimited Lite':'🔥 Hot Deal',
+      '160GB Value + Multi 160GB':'⭐ Staff Pick',
+      '250GB Value':'💡 Recommended'
+    };
+    PINNED = savedPinned.map(pkg => {
+      if(pkg && typeof pkg === 'object' && !pkg.banner){
+        return { ...pkg, banner: DEFAULT_BANNERS_BY_TITLE[pkg.title] || '📌 Pinned' };
+      }
+      return pkg;
+    });
+  }
+}catch{ /* ignore parse errors */ }
 
   // Try to load shared pinned packages from pinned.json at site root (if repo includes it)
   async function loadPinnedFromJSON(){
