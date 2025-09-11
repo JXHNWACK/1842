@@ -596,7 +596,7 @@ function packageFirst6(pkg){
       const first6 = packageFirst6(pkg).toFixed(2);
       const maxIntro = Math.max(0, ...pkg.items.map(it=>{ const pp = plans.find(x=>x.name===it.name); return pp && pp.introMonths ? pp.introMonths : 0; }));
       div.innerHTML = `
-        <div class="banner">📌 2 UNLIMITED SIMS FOR £XX</div>
+        <div class="banner">${pkg.banner || '📌 Pinned'}</div>
         <div class="top">
           <div class="ptitle">${pkg.title}</div>
           <button class="del" title="Remove">✕</button>
